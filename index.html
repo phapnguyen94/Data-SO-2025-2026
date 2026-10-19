@@ -367,8 +367,8 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       <div class="sp-ins-list" id="aso-ins"></div>
       <div class="sp-grid two">
         <div class="sp-card">
-          <h3><span data-ic="store"></span><span id="aso-chart-title">ASO theo ngành hàng: T9/2026 vs T9/2025</span></h3>
-          <p class="sp-note">Số CH có mua ngành hàng trong tháng, trên danh sách CH chuẩn T9. Theo phạm vi đang chọn.</p>
+          <div class="sp-tools"><h3><span data-ic="store"></span><span id="aso-chart-title">ASO theo ngành hàng: T9/2026 vs T9/2025</span></h3><div class="sp-seg aso-pseg" role="group" aria-label="Kỳ so sánh ASO"><button type="button" data-v="q3" aria-pressed="false">Quý 3 (T7–T9)</button><button type="button" data-v="m" aria-pressed="false">T9</button><button type="button" data-v="ytd" aria-pressed="false">T1–T9</button></div></div>
+          <p class="sp-note">Trên danh sách CH chuẩn T9, theo phạm vi đang chọn. Tháng: số CH có mua ngành trong tháng. Quý 3: trung bình ASO tháng T7–T9. T1–T9: số CH khác nhau có mua ít nhất 1 lần. Kỳ chọn ở đây đồng bộ với bảng phường.</p>
           <div class="sp-chart" id="aso-ng-chart" data-source="aso_nganh" style="min-height:300px"></div>
         </div>
         <div class="sp-card">
@@ -1231,7 +1231,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     if (![7, 8, 9].includes(S.ym)) S.ym = 9;
     const YM = S.ym, TM = 'T' + YM, keyM = YM + '-' + scope(), yM = Y && Y.find((r) => r.k === keyM), wM = 'k=' + enc(keyM);
     const EXC = ['Chăm sóc cá nhân', 'Snack'], okNg = (n) => !EXC.includes(n), cleanNg = (v) => (v ? String(v).split(',').map((x) => x.trim()).filter((x) => x && okNg(x)).join(', ') : '');
-    root.querySelectorAll('#ytd-mseg button').forEach((b) => { b.setAttribute('aria-pressed', String(Number(b.dataset.m) === YM)); if (!b.dataset.bound) { b.dataset.bound = 1; b.addEventListener('click', () => { S.ym = Number(b.dataset.m); render(); }); } });
+    root.querySelectorAll('#ytd-mseg button').forEach((b) => { b.setAttribute('aria-pressed', String(Number(b.dataset.m) === YM)); if (!b.dataset.bound) { b.dataset.bound = 1; b.addEventListener('click', () => { S.ym = Number(b.dataset.m); S.wardP = 'm'; render(); }); } });
     const wsb = root.querySelector('#ward-seg button[data-v="m"]'); if (wsb) wsb.textContent = TM + ' vs ' + TM + '/2025';
     const tiles = document.getElementById('ytd-tiles'); tiles.replaceChildren();
     if (y) {
@@ -1325,15 +1325,20 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     }
     insights(document.getElementById('aso-ins'), ['aso1']);
     const AN0 = D('aso_nganh');
+    const AP = S.wardP === 'q3' ? 'q3' : S.wardP === 'ytd' ? 'ytd' : 'm';
+    const PL = AP === 'q3' ? 'TB Q3' : AP === 'ytd' ? 'T1–T9' : TM;
+    const PA = AP === 'q3' ? 'TB/tháng Q3 2026' : AP === 'ytd' ? 'T1–T9/2026' : TM + '/2026', PB = AP === 'q3' ? 'TB Q3/2025' : AP === 'ytd' ? 'T1–T9/2025' : TM + '/2025';
+    root.querySelectorAll('.aso-pseg button').forEach((b) => { if (b.dataset.v === 'm') b.textContent = TM; b.setAttribute('aria-pressed', String(b.dataset.v === AP)); if (!b.dataset.bound) { b.dataset.bound = 1; b.addEventListener('click', () => { S.wardP = b.dataset.v; render(); }); } });
+    const pv = (r, y) => (AP === 'q3' ? ((r['a' + y + '_7'] || 0) + (r['a' + y + '_8'] || 0) + (r['a' + y + '_9'] || 0)) / 3 : AP === 'ytd' ? r['a' + y + '_ytd'] || 0 : r['a' + y + '_' + YM] || 0);
     const AN = AN0 && (() => { const den = {}; AN0.forEach((r) => { if (r.pen9 > 0 && r.a26_9 > 0 && !den[r.ddkd]) den[r.ddkd] = r.a26_9 / r.pen9; });
-      return AN0.filter((r) => okNg(r.nganh)).map((r) => { const a = r['a26_' + YM] || 0, b = r['a25_' + YM] || 0; return { ...r, _a26: a, _a25: b, _d: a - b, _yoy: b > 0 ? a / b - 1 : null, _pen: den[r.ddkd] ? a / den[r.ddkd] : null }; }); })();
+      return AN0.filter((r) => okNg(r.nganh)).map((r) => { const a = Math.round(pv(r, 26)), b = Math.round(pv(r, 25)); return { ...r, _a26: a, _a25: b, _d: a - b, _yoy: b > 0 ? a / b - 1 : null, _pen: den[r.ddkd] ? a / den[r.ddkd] : null }; }); })();
     S.asoExp = S.asoExp || {};
     const asoFocus = Object.keys(S.asoExp).filter((k) => S.asoExp[k]).pop();
-    document.getElementById('aso-chart-title').textContent = asoFocus ? 'ASO nhãn hàng ngành ' + asoFocus + ': ' + TM + '/2026 vs ' + TM + '/2025' : 'ASO theo ngành hàng: ' + TM + '/2026 vs ' + TM + '/2025';
+    document.getElementById('aso-chart-title').textContent = asoFocus ? 'ASO nhãn hàng ngành ' + asoFocus + ': ' + PA + ' vs ' + PB : 'ASO theo ngành hàng: ' + PA + ' vs ' + PB;
     chartInto('aso-ng-chart', 'aso_nganh', (box) => {
       const rows = AN.filter((r) => r.ddkd === scope() && (asoFocus ? r.lvl === 'brand' && r.parent === asoFocus : r.lvl === 'nganh') && (r._a26 || r._a25)).sort((a, b) => b._a26 - a._a26).slice(0, 14);
-      groupedH(box, rows, { cat: 'label', series: [{ f: '_a26', label: TM + '/2026', color: 'var(--o-acc)' }, { f: '_a25', label: TM + '/2025', color: 'var(--o-blue)' }], fmt: fN });
-      legend(box, [{ color: 'var(--o-acc)', label: 'ASO ' + TM + '/2026' }, { color: 'var(--o-blue)', label: 'ASO ' + TM + '/2025' }]);
+      groupedH(box, rows, { cat: 'label', series: [{ f: '_a26', label: PA, color: 'var(--o-acc)' }, { f: '_a25', label: PB, color: 'var(--o-blue)' }], fmt: fN });
+      legend(box, [{ color: 'var(--o-acc)', label: 'ASO ' + PA }, { color: 'var(--o-blue)', label: 'ASO ' + PB }]);
     });
     if (AN) {
       const mine = AN.filter((r) => r.ddkd === scope() && (r.a26_ytd || r.a25_ytd));
@@ -1345,12 +1350,12 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       const lab = { f: 'label', h: 'Ngành → Nhãn hàng', l: 1, fmt: (v, r) => (r.lvl === 'nganh' ? (S.asoExp[r.nganh] ? '▾ ' : '▸ ') + v : '\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'nganh' ? '' : 'mut') };
       const click = (r) => { if (r.lvl === 'nganh') { S.asoExp[r.nganh] = !S.asoExp[r.nganh]; render(); } };
       table(document.getElementById('aso-ng-sum'), { id: 'asos', key: 'k', rows, noSort: 1, onClick: click, cols: [
-        lab, { f: '_a26', h: 'ASO ' + TM, fmt: fN }, { f: '_a25', h: TM + '/2025', fmt: fN }, { f: '_d', h: 'Δ ' + TM, fmt: fNS, cls: sgnCls }, { f: '_yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
-        { f: '_pen', h: 'Độ phủ ' + TM, fmt: (v) => (isN(v) ? fP(v, 0) : '—') }, { f: 'a26_ytd', h: 'CH mua T1–T9', fmt: fN }, { f: 'a25_ytd', h: 'Cùng kỳ', fmt: fN }, { f: 'd_ytd', h: 'Δ', fmt: fNS, cls: sgnCls },
+        lab, { f: '_a26', h: AP === 'ytd' ? 'CH mua T1–T9' : 'ASO ' + PL, fmt: fN }, { f: '_a25', h: PB, fmt: fN }, { f: '_d', h: 'Δ ' + PL, fmt: fNS, cls: sgnCls }, { f: '_yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
+        { f: '_pen', h: 'Độ phủ ' + PL, fmt: (v) => (isN(v) ? fP(v, 0) : '—') }, ...(AP === 'ytd' ? [] : [{ f: 'a26_ytd', h: 'CH mua T1–T9', fmt: fN }, { f: 'a25_ytd', h: 'Cùng kỳ', fmt: fN }, { f: 'd_ytd', h: 'Δ', fmt: fNS, cls: sgnCls }]),
       ] });
       const mc = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => ({ f: 'a26_' + m, h: 'T' + m, fmt: fN }));
       table(document.getElementById('aso-ng-month'), { id: 'asom', key: 'k', rows, noSort: 1, onClick: click, cols: [
-        lab, ...mc, { f: 'a26_avg', h: 'TB 2026', fmt: (v) => fD(v, 0) }, { f: 'a25_avg', h: 'TB 2025', fmt: (v) => fD(v, 0) }, { f: '_a25', h: TM + '/2025', fmt: fN }, { f: '_d', h: 'Δ ' + TM, fmt: fNS, cls: sgnCls },
+        lab, ...mc, { f: 'a26_avg', h: 'TB 2026', fmt: (v) => fD(v, 0) }, { f: 'a25_avg', h: 'TB 2025', fmt: (v) => fD(v, 0) }, { f: '_a25', h: PB, fmt: fN }, { f: '_d', h: 'Δ ' + PL, fmt: fNS, cls: sgnCls },
       ] });
     }
     if (Y) {
