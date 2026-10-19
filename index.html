@@ -348,7 +348,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
           <div class="sp-chart" id="ytd-aso" data-source="ytd_ddkd" style="min-height:240px"></div>
         </div>
         <div class="sp-card">
-          <h3><span data-ic="pie"></span>Ngành hàng lũy kế T1–T9</h3>
+          <div class="sp-tools"><h3><span data-ic="pie"></span><span id="ytd-ng-title">Ngành hàng lũy kế T1–T9</span></h3><div class="sp-seg aso-pseg" role="group" aria-label="Kỳ xem ngành hàng"><button type="button" data-v="q3" aria-pressed="false">Quý 3</button><button type="button" data-v="m" aria-pressed="false">T9</button><button type="button" data-v="ytd" aria-pressed="false">T1–T9</button></div></div>
           <div class="sp-tablebox"><table class="sp-table" id="ytd-ng" data-source="ytd_nganh" data-row-key="k"></table></div>
         </div>
       </div>
@@ -1263,10 +1263,22 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       legend(box, [{ color: 'var(--o-blue)', label: 'ASO 2025' }, { color: 'var(--o-acc2)', label: 'ASO 2026' }]);
     });
     if (N) {
-      const rows = N.filter((r) => r.m === 0 && r.ddkd === scope() && okNg(r.nganh) && (r.ct > 0 || r.ds26 > 0));
+      const NP = S.wardP === 'ytd' ? 'ytd' : S.wardP === 'm' ? 'm' : 'q3';
+      const NL = NP === 'q3' ? 'Q3' : NP === 'm' ? TM : 'T1–T9';
+      document.getElementById('ytd-ng-title').textContent = NP === 'q3' ? 'Ngành hàng Quý 3 (T7–T9)' : NP === 'm' ? 'Ngành hàng ' + TM : 'Ngành hàng lũy kế T1–T9';
+      const mineN = N.filter((r) => r.ddkd === scope() && okNg(r.nganh));
+      let rows;
+      if (NP === 'q3') {
+        const by = {}; mineN.filter((r) => [7, 8, 9].includes(r.m)).forEach((r) => { const o = by[r.nganh] || (by[r.nganh] = { k: 'q3-' + scope() + '-' + r.nganh, nganh: r.nganh, ct: 0, th: 0, ds26: 0, ds25: 0 }); o.ct += r.ct || 0; o.th += r.th || 0; o.ds26 += r.ds26 || 0; o.ds25 += r.ds25 || 0; o['p' + r.m] = r.pct; o['y' + r.m] = r.yoy; });
+        rows = Object.values(by).map((o) => ({ ...o, pct: o.ct > 0 ? o.th / o.ct : null, yoy: o.ds25 > 0 ? o.ds26 / o.ds25 - 1 : null })).filter((r) => r.ct > 0 || r.ds26 > 0);
+      } else rows = mineN.filter((r) => r.m === (NP === 'm' ? YM : 0) && (r.ct > 0 || r.ds26 > 0));
       if (!S.sort.ytdng) S.sort.ytdng = { f: 'th', dir: 'desc' };
+      const pc = (v) => (isN(v) ? fP(v, 0) : '—');
       table(document.getElementById('ytd-ng'), { id: 'ytdng', key: 'k', rows, cols: [
-        { f: 'nganh', h: 'Ngành hàng', l: 1 }, { f: 'ct', h: 'CT T1–T9', fmt: fTr }, { f: 'th', h: 'TH T1–T9', fmt: fTr }, { f: 'pct', h: '% CT', fmt: (v) => fP(v, 0), cls: pctCls, pill: 1 }, { f: 'ds26', h: 'DS 2026', fmt: fTr }, { f: 'ds25', h: 'DS 2025', fmt: fTr }, { f: 'yoy', h: '± cùng kỳ', fmt: (v) => fPS(v, 0), cls: sgnCls },
+        { f: 'nganh', h: 'Ngành hàng', l: 1 }, { f: 'ct', h: 'CT ' + NL, fmt: fTr }, { f: 'th', h: 'TH ' + NL, fmt: fTr }, { f: 'pct', h: '% CT', fmt: pc, cls: pctCls, pill: 1 },
+        ...(NP === 'q3' ? [7, 8, 9].map((m) => ({ f: 'p' + m, h: '% CT T' + m, fmt: pc, cls: pctCls })) : []),
+        { f: 'ds26', h: 'DS ' + NL + '/2026', fmt: fTr }, { f: 'ds25', h: NL + '/2025', fmt: fTr }, { f: 'yoy', h: '± cùng kỳ', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
+        ...(NP === 'q3' ? [7, 8, 9].map((m) => ({ f: 'y' + m, h: '± T' + m, fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls })) : []),
       ] });
     }
     // ---- ward
