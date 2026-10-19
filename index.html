@@ -378,8 +378,8 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
         </div>
       </div>
       <div class="sp-card">
-        <h3><span data-ic="calendar"></span>ASO từng tháng theo ngành hàng T1 → T9/2026</h3>
-        <p class="sp-note">Bấm ngành để xổ nhãn hàng. ASO 2026 từng tháng, trung bình tháng 2026 vs 2025, và ASO cùng kỳ 2025 của tháng đang chọn.</p>
+        <div class="sp-tools"><h3><span data-ic="calendar"></span><span id="aso-month-title">ASO từng tháng theo ngành hàng T1 → T9/2026</span></h3><div class="sp-seg aso-pseg" role="group" aria-label="Kỳ xem ASO từng tháng"><button type="button" data-v="q3" aria-pressed="false">Quý 3 (T7–T9)</button><button type="button" data-v="m" aria-pressed="false">T9</button><button type="button" data-v="ytd" aria-pressed="false">T1–T9</button></div></div>
+        <p class="sp-note">Bấm ngành để xổ nhãn hàng. Quý 3: ASO T7, T8, T9 năm 2026 đặt cạnh cùng tháng 2025, kèm trung bình quý và chênh lệch. T1–T9 / tháng: ASO 2026 từng tháng, trung bình tháng 2026 vs 2025 và cùng kỳ của kỳ đang chọn. Kỳ đồng bộ với biểu đồ ASO và bảng phường.</p>
         <div class="sp-tablebox"><table class="sp-table" id="aso-ng-month" data-source="aso_nganh" data-row-key="k"></table></div>
       </div>
       <div class="sp-card">
@@ -1353,10 +1353,19 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
         lab, { f: '_a26', h: AP === 'ytd' ? 'CH mua T1–T9' : 'ASO ' + PL, fmt: fN }, { f: '_a25', h: PB, fmt: fN }, { f: '_d', h: 'Δ ' + PL, fmt: fNS, cls: sgnCls }, { f: '_yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
         { f: '_pen', h: 'Độ phủ ' + PL, fmt: (v) => (isN(v) ? fP(v, 0) : '—') }, ...(AP === 'ytd' ? [] : [{ f: 'a26_ytd', h: 'CH mua T1–T9', fmt: fN }, { f: 'a25_ytd', h: 'Cùng kỳ', fmt: fN }, { f: 'd_ytd', h: 'Δ', fmt: fNS, cls: sgnCls }]),
       ] });
+      document.getElementById('aso-month-title').textContent = AP === 'q3' ? 'ASO từng tháng theo ngành hàng Quý 3: T7 · T8 · T9 (2026 vs 2025)' : 'ASO từng tháng theo ngành hàng T1 → T9/2026';
+      if (AP === 'q3') {
+        rows.forEach((r) => [7, 8, 9].forEach((m) => { r['_dm' + m] = (r['a26_' + m] || 0) - (r['a25_' + m] || 0); }));
+        const qc = [7, 8, 9].flatMap((m) => [{ f: 'a26_' + m, h: 'T' + m + '/26', fmt: fN }, { f: 'a25_' + m, h: 'T' + m + '/25', fmt: (v) => fN(v || 0), cls: () => 'mut' }, { f: '_dm' + m, h: 'Δ T' + m, fmt: fNS, cls: sgnCls }]);
+        table(document.getElementById('aso-ng-month'), { id: 'asom', key: 'k', rows, noSort: 1, onClick: click, cols: [
+          lab, ...qc, { f: '_a26', h: 'TB Q3/26', fmt: fN }, { f: '_a25', h: 'TB Q3/25', fmt: fN }, { f: '_d', h: 'Δ TB Q3', fmt: fNS, cls: sgnCls }, { f: '_yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
+        ] });
+      } else {
       const mc = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => ({ f: 'a26_' + m, h: 'T' + m, fmt: fN }));
       table(document.getElementById('aso-ng-month'), { id: 'asom', key: 'k', rows, noSort: 1, onClick: click, cols: [
         lab, ...mc, { f: 'a26_avg', h: 'TB 2026', fmt: (v) => fD(v, 0) }, { f: 'a25_avg', h: 'TB 2025', fmt: (v) => fD(v, 0) }, { f: '_a25', h: PB, fmt: fN }, { f: '_d', h: 'Δ ' + PL, fmt: fNS, cls: sgnCls },
       ] });
+      }
     }
     if (Y) {
       const rows = Y.filter((r) => r.m === 9).map((r) => { const q = Y.find((x) => x.m === YM && x.ddkd === r.ddkd) || {}; return { ...r, _ds26: q.ds26, _ds25: q.ds25, _yoy: q.yoy, _aso26: q.aso26, _aso25: q.aso25, _daso: q.d_aso, _off: q.aso_off26, _on: q.aso_on26 }; });
