@@ -339,8 +339,8 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       <div class="sp-ins-list" id="ward-ins"></div>
       <div class="sp-card">
         <div class="sp-tools"><h3><span data-ic="store"></span>Chi tiết theo phường — rớt ở đâu, ngành nào</h3>
-          <div class="sp-seg" id="ward-seg" role="group" aria-label="Kỳ so sánh"><button type="button" data-v="t9" aria-pressed="true">T9 vs T9/2025</button><button type="button" data-v="ytd" aria-pressed="false">T1–T9 vs cùng kỳ</button></div></div>
-        <p class="sp-note">Trên danh sách CH chuẩn T9. Bấm phường để xổ theo ngành hàng và theo ĐDKD. Đỏ = giảm so với cùng kỳ.</p>
+          <div class="sp-seg" id="ward-seg" role="group" aria-label="Kỳ so sánh"><button type="button" data-v="q3" aria-pressed="true">Quý 3 (T7–T9) vs cùng kỳ</button><button type="button" data-v="m" aria-pressed="false">T9 vs T9/2025</button><button type="button" data-v="ytd" aria-pressed="false">T1–T9 vs cùng kỳ</button></div></div>
+        <p class="sp-note">Trên danh sách CH chuẩn T9. Quý 3 = cộng DS T7+T8+T9, kèm ± cùng kỳ từng tháng và ASO trung bình 3 tháng. Nút tháng lấy theo tháng chọn ở đầu tab. Bấm phường để xổ theo ngành hàng và theo ĐDKD. Đỏ = giảm so với cùng kỳ.</p>
         <div class="sp-tablebox" style="max-height:none"><table class="sp-table" id="ward-table" data-source="ward" data-row-key="k"></table></div>
       </div>
       <div class="sp-card">
@@ -1216,7 +1216,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     const YM = S.ym, TM = 'T' + YM, keyM = YM + '-' + scope(), yM = Y && Y.find((r) => r.k === keyM), wM = 'k=' + enc(keyM);
     const EXC = ['Chăm sóc cá nhân', 'Snack'], okNg = (n) => !EXC.includes(n), cleanNg = (v) => (v ? String(v).split(',').map((x) => x.trim()).filter((x) => x && okNg(x)).join(', ') : '');
     root.querySelectorAll('#ytd-mseg button').forEach((b) => { b.setAttribute('aria-pressed', String(Number(b.dataset.m) === YM)); if (!b.dataset.bound) { b.dataset.bound = 1; b.addEventListener('click', () => { S.ym = Number(b.dataset.m); render(); }); } });
-    const wsb = root.querySelector('#ward-seg button[data-v="t9"]'); if (wsb) wsb.textContent = TM + ' vs ' + TM + '/2025';
+    const wsb = root.querySelector('#ward-seg button[data-v="m"]'); if (wsb) wsb.textContent = TM + ' vs ' + TM + '/2025';
     const tiles = document.getElementById('ytd-tiles'); tiles.replaceChildren();
     if (y) {
       const w = 'k=' + enc(key);
@@ -1255,14 +1255,24 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     }
     // ---- ward
     insights(document.getElementById('ward-ins'), ['ward1']);
-    if (!S.wardP) S.wardP = 't9';
+    if (!S.wardP || S.wardP === 't9') S.wardP = 'q3';
     root.querySelectorAll('#ward-seg button').forEach((b) => { b.setAttribute('aria-pressed', String(b.dataset.v === S.wardP)); if (!b.dataset.bound) { b.dataset.bound = 1; b.addEventListener('click', () => { S.wardP = b.dataset.v; render(); }); } });
     const WD = D('ward');
     if (WD) {
-      const t9 = S.wardP === 't9';
-      const F = t9 ? { a: 't' + YM + '_26', b: 't' + YM + '_25', y: 'yoy' + YM, h1: 'DS ' + TM + '/2026', h2: TM + '/2025' } : { a: 'ds26', b: 'ds25', y: 'yoy', h1: 'DS T1–T9/2026', h2: 'T1–T9/2025' };
+      const t9 = S.wardP === 'm', q3 = S.wardP === 'q3';
+      const F = q3 ? { a: 'q26', b: 'q25', y: 'yoyq', h1: 'DS Q3/2026 (T7–T9)', h2: 'Q3/2025' } : t9 ? { a: 't' + YM + '_26', b: 't' + YM + '_25', y: 'yoy' + YM, h1: 'DS ' + TM + '/2026', h2: TM + '/2025' } : { a: 'ds26', b: 'ds25', y: 'yoy', h1: 'DS T1–T9/2026', h2: 'T1–T9/2025' };
       S.wardOpen = S.wardOpen || {};
-      const mine = WD.filter((r) => r.ddkd === scope() && (r.lvl !== 'ng' || okNg(r.label))).map((r) => (r.lvl === 'ward' ? { ...r, _ngd: cleanNg(r[t9 ? 'ng_down' + YM : 'ng_down']) } : r));
+      const chg = (a, b) => (b > 0 ? a / b - 1 : null);
+      const mine0 = WD.filter((r) => r.ddkd === scope() && (r.lvl !== 'ng' || okNg(r.label))).map((r) => ({ ...r, _y7: chg(r.t7_26, r.t7_25), _y8: chg(r.t8_26, r.t8_25), _y9: chg(r.t9_26, r.t9_25), _asoq26: (r.aso7_26 + r.aso8_26 + r.aso9_26) / 3, _dasoq: (r.aso7_26 + r.aso8_26 + r.aso9_26 - r.aso7_25 - r.aso8_25 - r.aso9_25) / 3 }));
+      const qTot = d3.sum(mine0.filter((r) => r.lvl === 'ward'), (r) => r.q26) || 1;
+      const qWard = (w) => (mine0.find((r) => r.lvl === 'ward' && r.ward === w) || {}).q26 || 1;
+      const mine = mine0.map((r) => {
+        if (r.lvl === 'ward') {
+          const ngq = mine0.filter((x) => x.lvl === 'ng' && x.parent === r.ward && x.q26 < x.q25).sort((a, b) => (a.q26 - a.q25) - (b.q26 - b.q25)).map((x) => x.label).join(', ');
+          return { ...r, _shq: r.q26 / qTot, _ngd: q3 ? ngq : cleanNg(r[t9 ? 'ng_down' + YM : 'ng_down']) };
+        }
+        return { ...r, _shq: r.q26 / qWard(r.parent) };
+      });
       const rows = [];
       mine.filter((r) => r.lvl === 'ward').sort((a, b) => b[F.a] - a[F.a]).forEach((w) => {
         rows.push(w);
@@ -1278,8 +1288,10 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
         { f: 'label', h: 'Phường → ngành / ĐDKD', l: 1, fmt: (v, r) => (r.lvl === 'ward' ? (S.wardOpen[r.ward] ? '▾ ' : '▸ ') + v : r.lvl === 'hdr' ? '\u2003' + v.toUpperCase() : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'hdr' ? 'a' : r.lvl === 'ward' ? '' : 'mut') },
         { f: 'n_ch', h: 'Số CH', fmt: (v) => (isN(v) ? fN(v) : '') }, { f: F.a, h: F.h1, fmt: (v) => (isN(v) ? fTr(v) : '') }, { f: F.b, h: F.h2, fmt: (v) => (isN(v) ? fTr(v) : '') },
         { f: F.y, h: '± cùng kỳ', fmt: (v) => (isN(v) ? fPS(v, 0) : ''), cls: sgnCls, pill: 1 }, { f: '_gap', h: '± tiền', fmt: (v) => (isN(v) ? fTrS(v) : ''), cls: sgnCls },
-        { f: 'mom' + YM, h: TM + ' vs T' + (YM - 1), fmt: (v) => (isN(v) ? fPS(v, 0) : ''), cls: sgnCls }, { f: 'aso' + YM + '_26', h: 'ASO ' + TM, fmt: (v) => (isN(v) ? fN(v) : '') }, { f: 'd_aso' + YM, h: 'Δ ASO cùng kỳ', fmt: (v) => (isN(v) ? fNS(v) : ''), cls: sgnCls },
-        { f: 'share', h: 'Tỷ trọng', fmt: (v) => (isN(v) ? fP(v, 0) : '') }, { f: '_ngd', h: t9 ? 'Ngành giảm ' + TM : 'Ngành giảm lũy kế', l: 1, wrap: 1, cls: () => 'b', fmt: (v) => v || '' },
+        ...(q3 ? [7, 8, 9].map((m) => ({ f: '_y' + m, h: '± T' + m, fmt: (v) => (isN(v) ? fPS(v, 0) : ''), cls: sgnCls })) : [{ f: 'mom' + YM, h: TM + ' vs T' + (YM - 1), fmt: (v) => (isN(v) ? fPS(v, 0) : ''), cls: sgnCls }]),
+        q3 ? { f: '_asoq26', h: 'ASO TB Q3', fmt: (v) => (isN(v) ? fN(v) : '') } : { f: 'aso' + YM + '_26', h: 'ASO ' + TM, fmt: (v) => (isN(v) ? fN(v) : '') },
+        q3 ? { f: '_dasoq', h: 'Δ ASO TB cùng kỳ', fmt: (v) => (isN(v) ? fNS(v) : ''), cls: sgnCls } : { f: 'd_aso' + YM, h: 'Δ ASO cùng kỳ', fmt: (v) => (isN(v) ? fNS(v) : ''), cls: sgnCls },
+        { f: q3 ? '_shq' : 'share', h: 'Tỷ trọng', fmt: (v) => (isN(v) ? fP(v, 0) : '') }, { f: '_ngd', h: q3 ? 'Ngành giảm Q3' : t9 ? 'Ngành giảm ' + TM : 'Ngành giảm lũy kế', l: 1, wrap: 1, cls: () => 'b', fmt: (v) => v || '' },
       ] });
       // matrix
       const wards = mine.filter((r) => r.lvl === 'ward').sort((a, b) => b[F.a] - a[F.a]);
