@@ -563,6 +563,8 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
         <p class="sp-note" id="t7l-note"></p>
         <div class="sp-tiles" id="t7l-tiles"></div>
         <div class="sp-tablebox"><table class="sp-table" id="t7l-table" data-source="mcpon_ch" data-row-key="k"></table></div>
+        <h4 class="sp-sub" style="margin:14px 0 6px">Chi tiết theo ĐDKD (bấm tên ĐDKD để xem danh sách quầy)</h4>
+        <div class="sp-tablebox"><table class="sp-table" id="t7l-dd" data-source="mcpon_ch" data-row-key="k"></table></div>
         <div id="t7l-wrap" hidden>
           <div class="sp-tools"><div class="sp-seg" id="t7l-seg" role="group" aria-label="Trạng thái Tea365"></div><input class="sp-search" id="t7l-search" type="search" placeholder="Tìm mã / tên KH / ĐDKD" aria-label="Tìm KH"></div>
           <div class="sp-tablebox" style="max-height:480px"><table class="sp-table" id="t7l-ch" data-source="mcpon_ch" data-row-key="k"></table></div>
@@ -1674,6 +1676,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     if (!CHd) return;
     const who = scope(), inv = {};
     Object.keys(T7L).forEach((k) => T7L[k].forEach((l) => { inv[l] = k; }));
+    const base7 = CHd.filter((x) => x.m === M && inv[x.l2]).map((x) => ({ ...x, t7: inv[x.l2] }));
     const all = CHd.filter((x) => x.m === M && (who === TEAM || x.ddkd === who)).map((x) => ({ ...x, t7: inv[x.l2] || null })).filter((x) => x.t7);
     const allMcp = CHd.filter((x) => x.m === M && (who === TEAM || x.ddkd === who)).length;
     document.getElementById('t7l-note').textContent = 'Chỉ tính quầy có loại hình L2 (theo file MCP ON ' + ML + ') nằm trong 7 loại hình KPI kênh ON: ' + Object.keys(T7L).join(' · ') + '. Canteen gồm L2 Canteen và Suất ăn công nghiệp. MCP ON chưa có L2 Máy bán hàng tự động / Quốc lộ / Thể thao nên các dòng này = 0. "Có Tea365" = quầy có đơn Tea365 trong ' + ML + '.';
@@ -1693,12 +1696,22 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       { f: 't7', h: 'Loại hình L2', l: 1 }, { f: 'mcp', h: 'Quầy trong MCP', fmt: fN }, { f: 'act', h: 'Active', fmt: fN }, { f: 'tea', h: 'Có mua Tea365', fmt: fN, cls: (v) => (v ? 'g' : 'mut') },
       { f: 'rate', h: '% Tea365/MCP', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 }, { f: 'noTea', h: 'Chưa mua Tea365', fmt: fN, cls: (v) => (v ? 'b' : 'mut') }, { f: 'tds', h: 'DS Tea365', fmt: fTr },
     ] });
-    const wrap = document.getElementById('t7l-wrap'); wrap.hidden = !S.t7lSel;
-    if (!S.t7lSel) return;
+    const ddNames = Array.from(new Set(base7.map((x) => x.ddkd))).sort();
+    const ddRow = (nm, z) => { const c = z.filter((x) => x.tea).length, bt = (t) => { const y = z.filter((x) => x.t7 === t); return y.length ? y.filter((x) => x.tea).length + '/' + y.length : '—'; };
+      return { k: nm, ddkd: nm, mcp: z.length, act: z.filter((x) => x.act).length, tea: c, noTea: z.length - c, actNoTea: z.filter((x) => x.act && !x.tea).length, rate: z.length ? c / z.length : null, tds: d3.sum(z, (x) => x.tds || 0), qn: bt('Quán nước'), gt: bt('Giải trí'), vc: bt('Vận chuyển hành khách'), ct: bt('Canteen'), tt: bt('Thể thao') }; };
+    const ddRows = [ddRow(TEAM, base7), ...ddNames.map((n) => ddRow(n, base7.filter((x) => x.ddkd === n)))];
+    if (!S.sort.t7dd) S.sort.t7dd = { f: 'mcp', dir: 'desc' };
+    table(document.getElementById('t7l-dd'), { id: 't7dd', key: 'k', rows: ddRows, pin: { f: 'ddkd', v: TEAM }, sel: (x) => x.ddkd === S.t7lDd, onClick: (x) => { S.t7lDd = (x.ddkd === TEAM || S.t7lDd === x.ddkd) ? null : x.ddkd; render(); }, cols: [
+      { f: 'ddkd', h: 'ĐDKD', l: 1, fmt: (v) => (v === TEAM ? 'Team SS Pháp' : v) }, { f: 'mcp', h: 'Quầy 7 loại hình', fmt: fN }, { f: 'act', h: 'Active', fmt: fN }, { f: 'tea', h: 'Có mua Tea365', fmt: fN, cls: (v) => (v ? 'g' : 'mut') },
+      { f: 'rate', h: '% Tea365/quầy', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 }, { f: 'noTea', h: 'Chưa mua Tea365', fmt: fN, cls: (v) => (v ? 'b' : 'mut') }, { f: 'actNoTea', h: 'Active chưa Tea', fmt: fN }, { f: 'tds', h: 'DS Tea365', fmt: fTr },
+      { f: 'qn', h: 'Quán nước (Tea/quầy)' }, { f: 'gt', h: 'Giải trí' }, { f: 'vc', h: 'Vận chuyển HK' }, { f: 'ct', h: 'Canteen' }, { f: 'tt', h: 'Thể thao' },
+    ] });
+    const wrap = document.getElementById('t7l-wrap'); wrap.hidden = !(S.t7lSel || S.t7lDd);
+    if (!S.t7lSel && !S.t7lDd) return;
     S.t7lF = S.t7lF || 'Tất cả';
     const sg = document.getElementById('t7l-seg'); sg.replaceChildren();
     ['Tất cả', 'Có Tea365', 'Chưa Tea365'].forEach((v) => { const b = el('button', '', v); b.type = 'button'; b.setAttribute('aria-pressed', String(S.t7lF === v)); b.addEventListener('click', () => { S.t7lF = v; render(); }); sg.appendChild(b); });
-    let r2 = all.filter((x) => x.t7 === S.t7lSel && (S.t7lF === 'Tất cả' || (S.t7lF === 'Có Tea365') === !!x.tea));
+    let r2 = base7.filter((x) => (!S.t7lSel || x.t7 === S.t7lSel) && (!S.t7lDd || x.ddkd === S.t7lDd) && (S.t7lF === 'Tất cả' || (S.t7lF === 'Có Tea365') === !!x.tea));
     r2 = searchFilter(r2, 't7l', ['code', 'name', 'ddkd']);
     if (!S.sort.t7lch) S.sort.t7lch = { f: 'tea', dir: 'asc' };
     table(document.getElementById('t7l-ch'), { id: 't7lch', key: 'k', rows: r2, cols: [
