@@ -568,16 +568,6 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
           <div class="sp-tablebox" style="max-height:480px"><table class="sp-table" id="t7l-ch" data-source="mcpon_ch" data-row-key="k"></table></div>
         </div>
       </div>
-      <div class="sp-card" id="t7-card">
-        <div class="sp-tools"><h3><span data-ic="target"></span>Tracking Tea365 · 7 loại hình trọng tâm kênh ON</h3></div>
-        <p class="sp-note" id="t7-note"></p>
-        <div class="sp-tiles" id="t7-tiles"></div>
-        <div class="sp-tablebox"><table class="sp-table" id="t7-table" data-source="mcpon_ch" data-row-key="k"></table></div>
-        <div id="t7-wrap" hidden>
-          <div class="sp-tools"><div class="sp-seg" id="t7-seg" role="group" aria-label="Trạng thái Tea365"></div><input class="sp-search" id="t7-search" type="search" placeholder="Tìm mã / tên KH / ĐDKD" aria-label="Tìm KH"></div>
-          <div class="sp-tablebox" style="max-height:480px"><table class="sp-table" id="t7-ch" data-source="mcpon_ch" data-row-key="k"></table></div>
-        </div>
-      </div>
       <div class="sp-card">
         <div class="sp-tools"><h3><span data-ic="users"></span>SS → ĐDKD → khách hàng ON</h3><div class="sp-crumb" id="mo-crumb"></div></div>
         <p class="sp-note">Bấm dòng Team SS Pháp để xổ ĐDKD, bấm ĐDKD để xem từng quầy ON với số đơn và ngày đặt đơn.</p>
@@ -1788,7 +1778,6 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       { f: 'tea', h: 'Mua Tea365', fmt: fN }, { f: 'tea_rate', h: '% Tea/MCP', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 }, { f: 'tea_ds', h: 'DS Tea365', fmt: fTr },
     ] });
     try { renderT7L(CHd, M, ML, Q); } catch (e) { console.error(e); }
-    try { renderT7(CHd, M, ML, Q); } catch (e) { console.error(e); }
     crumb(document.getElementById('mo-crumb'), S.moSel, () => { S.moSel = null; render(); });
     const wrap = document.getElementById('mo-wrap'); const who = S.moSel || (S.dd || null);
     wrap.hidden = !(who && CHd);
