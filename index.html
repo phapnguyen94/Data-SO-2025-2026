@@ -177,6 +177,19 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
 .sp .gp-tile .ic{border-color:var(--gc);color:var(--gc);background:transparent}
 .sp .gp-tile .sub{font-size:12.5px}
 .sp .gp-tile .sub .emph-chip.gap{font-size:13px;background:rgba(238,106,16,.28);color:#ffc08f}
+
+/* ===== tất cả ô (tile) nổi bật: màu theo vị trí, số lớn ===== */
+.sp .sp-tiles>.sp-tile{--gc:var(--o-acc);border-width:1.5px;border-color:color-mix(in srgb,var(--gc) 70%,#2b2b2f);padding-top:18px;background:linear-gradient(180deg,rgba(255,255,255,.05),var(--o-panel))}
+.sp .sp-tiles>.sp-tile:nth-child(6n+2){--gc:#4f86e8}.sp .sp-tiles>.sp-tile:nth-child(6n+3){--gc:#43d39e}.sp .sp-tiles>.sp-tile:nth-child(6n+4){--gc:#f2a20d}.sp .sp-tiles>.sp-tile:nth-child(6n+5){--gc:#a78bfa}.sp .sp-tiles>.sp-tile:nth-child(6n){--gc:#ff5d7a}
+.sp .sp-tiles>.sp-tile:before{left:0!important;right:0!important;top:0!important;height:6px!important;border-radius:0!important;opacity:1!important;background:var(--gc)!important}
+.sp .sp-tiles>.sp-tile .name{color:#f4f1ec;font-weight:700}
+.sp .sp-tiles>.sp-tile .big{font-size:clamp(2.1rem,3.3vw,2.9rem);font-weight:800;color:var(--gc);line-height:1.05}
+.sp .sp-tiles>.sp-tile .ic{border-color:var(--gc);color:var(--gc);background:transparent}
+.sp .sp-tiles>.sp-tile.emph-gap{--gc:#ee6a10}.sp .sp-tiles>.sp-tile.emph-gap .big{color:#ffa45c}
+.sp .sp-tiles>.sp-tile.gp-tile{border-color:var(--gc)}
+.sp .sp-tiles>.sp-tile .sub{font-size:12.5px}
+.sp .sp-tiles>.sp-tile.gp-tile.gp-A{--gc:#f2a20d}.sp .sp-tiles>.sp-tile.gp-tile.gp-B{--gc:#4f86e8}.sp .sp-tiles>.sp-tile.gp-tile.gp-C,.sp .sp-tiles>.sp-tile.gp-tile.gp-DAT{--gc:#43d39e}.sp .sp-tiles>.sp-tile.gp-tile.gp-D{--gc:#ff5d5d}
+.sp .sp-tiles>.sp-tile.gp-tile .big{font-size:clamp(2.6rem,4.2vw,3.4rem)}
 </style></head><body><div id="dash-root">
 <div class="sp" id="sp">
   <header class="sp-head" id="top">
