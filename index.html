@@ -566,6 +566,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
         <h4 class="sp-sub" style="margin:14px 0 6px">Chi tiết theo ĐDKD (bấm tên ĐDKD để xem danh sách quầy)</h4>
         <div class="sp-tablebox"><table class="sp-table" id="t7l-dd" data-source="mcpon_ch" data-row-key="k"></table></div>
         <div id="t7l-wrap" hidden>
+          <div class="sp-tools"><h4 class="sp-sub" id="t7l-title" style="margin:10px 0 4px"></h4><button type="button" class="sp-btn" id="t7l-clear">Bỏ chọn</button></div>
           <div class="sp-tools"><div class="sp-seg" id="t7l-seg" role="group" aria-label="Trạng thái Tea365"></div><input class="sp-search" id="t7l-search" type="search" placeholder="Tìm mã / tên KH / ĐDKD" aria-label="Tìm KH"></div>
           <div class="sp-tablebox" style="max-height:480px"><table class="sp-table" id="t7l-ch" data-source="mcpon_ch" data-row-key="k"></table></div>
         </div>
@@ -1692,7 +1693,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       return { k: t, t7: t, mcp: z.length, act: z.filter((x) => x.act).length, tea: c, noTea: z.length - c, rate: z.length ? c / z.length : null, tds: d3.sum(z, (x) => x.tds || 0) };
     });
     if (!S.sort.t7l) S.sort.t7l = { f: 'mcp', dir: 'desc' };
-    table(document.getElementById('t7l-table'), { id: 't7l', key: 'k', rows, sel: (x) => x.t7 === S.t7lSel, onClick: (x) => { S.t7lSel = S.t7lSel === x.t7 ? null : x.t7; render(); }, cols: [
+    table(document.getElementById('t7l-table'), { id: 't7l', key: 'k', rows, sel: (x) => x.t7 === S.t7lSel, onClick: (x) => { S.t7lSel = S.t7lSel === x.t7 ? null : x.t7; S.t7lScroll = 1; render(); }, cols: [
       { f: 't7', h: 'Loại hình L2', l: 1 }, { f: 'mcp', h: 'Quầy trong MCP', fmt: fN }, { f: 'act', h: 'Active', fmt: fN }, { f: 'tea', h: 'Có mua Tea365', fmt: fN, cls: (v) => (v ? 'g' : 'mut') },
       { f: 'rate', h: '% Tea365/MCP', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 }, { f: 'noTea', h: 'Chưa mua Tea365', fmt: fN, cls: (v) => (v ? 'b' : 'mut') }, { f: 'tds', h: 'DS Tea365', fmt: fTr },
     ] });
@@ -1701,7 +1702,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       return { k: nm, ddkd: nm, mcp: z.length, act: z.filter((x) => x.act).length, tea: c, noTea: z.length - c, actNoTea: z.filter((x) => x.act && !x.tea).length, rate: z.length ? c / z.length : null, tds: d3.sum(z, (x) => x.tds || 0), qn: bt('Quán nước'), gt: bt('Giải trí'), vc: bt('Vận chuyển hành khách'), ct: bt('Canteen'), tt: bt('Thể thao') }; };
     const ddRows = [ddRow(TEAM, base7), ...ddNames.map((n) => ddRow(n, base7.filter((x) => x.ddkd === n)))];
     if (!S.sort.t7dd) S.sort.t7dd = { f: 'mcp', dir: 'desc' };
-    table(document.getElementById('t7l-dd'), { id: 't7dd', key: 'k', rows: ddRows, pin: { f: 'ddkd', v: TEAM }, sel: (x) => x.ddkd === S.t7lDd, onClick: (x) => { S.t7lDd = (x.ddkd === TEAM || S.t7lDd === x.ddkd) ? null : x.ddkd; render(); }, cols: [
+    table(document.getElementById('t7l-dd'), { id: 't7dd', key: 'k', rows: ddRows, pin: { f: 'ddkd', v: TEAM }, sel: (x) => x.ddkd === S.t7lDd, onClick: (x) => { S.t7lDd = (x.ddkd === TEAM || S.t7lDd === x.ddkd) ? null : x.ddkd; S.t7lScroll = 1; render(); }, cols: [
       { f: 'ddkd', h: 'ĐDKD', l: 1, fmt: (v) => (v === TEAM ? 'Team SS Pháp' : v) }, { f: 'mcp', h: 'Quầy 7 loại hình', fmt: fN }, { f: 'act', h: 'Active', fmt: fN }, { f: 'tea', h: 'Có mua Tea365', fmt: fN, cls: (v) => (v ? 'g' : 'mut') },
       { f: 'rate', h: '% Tea365/quầy', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 }, { f: 'noTea', h: 'Chưa mua Tea365', fmt: fN, cls: (v) => (v ? 'b' : 'mut') }, { f: 'actNoTea', h: 'Active chưa Tea', fmt: fN }, { f: 'tds', h: 'DS Tea365', fmt: fTr },
       { f: 'qn', h: 'Quán nước (Tea/quầy)' }, { f: 'gt', h: 'Giải trí' }, { f: 'vc', h: 'Vận chuyển HK' }, { f: 'ct', h: 'Canteen' }, { f: 'tt', h: 'Thể thao' },
@@ -1709,6 +1710,9 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     const wrap = document.getElementById('t7l-wrap'); wrap.hidden = !(S.t7lSel || S.t7lDd);
     if (!S.t7lSel && !S.t7lDd) return;
     S.t7lF = S.t7lF || 'Tất cả';
+    document.getElementById('t7l-title').textContent = 'Danh sách quầy · ' + (S.t7lDd || 'Team SS Pháp') + (S.t7lSel ? ' · ' + S.t7lSel : ' · cả 7 loại hình');
+    const clr = document.getElementById('t7l-clear'); clr.onclick = () => { S.t7lSel = null; S.t7lDd = null; render(); };
+    if (S.t7lScroll) { S.t7lScroll = 0; setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); }
     const sg = document.getElementById('t7l-seg'); sg.replaceChildren();
     ['Tất cả', 'Có Tea365', 'Chưa Tea365'].forEach((v) => { const b = el('button', '', v); b.type = 'button'; b.setAttribute('aria-pressed', String(S.t7lF === v)); b.addEventListener('click', () => { S.t7lF = v; render(); }); sg.appendChild(b); });
     let r2 = base7.filter((x) => (!S.t7lSel || x.t7 === S.t7lSel) && (!S.t7lDd || x.ddkd === S.t7lDd) && (S.t7lF === 'Tất cả' || (S.t7lF === 'Có Tea365') === !!x.tea));
@@ -1716,7 +1720,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     if (!S.sort.t7lch) S.sort.t7lch = { f: 'tea', dir: 'asc' };
     table(document.getElementById('t7l-ch'), { id: 't7lch', key: 'k', rows: r2, cols: [
       { f: 'code', h: 'Mã KH', l: 1 }, { f: 'name', h: 'Tên KH', l: 1 }, { f: 'ddkd', h: 'ĐDKD', l: 1 }, { f: 'l2', h: 'L2', l: 1 }, { f: 'ward', h: 'Phường', l: 1 },
-      { f: 'orders', h: 'Số đơn', fmt: fN }, { f: 'tea', h: 'Tea365', l: 1, fmt: (v, x) => (v ? (Q ? x.tpat : '✓ ' + (x.tdays || '')) : 'Chưa mua'), cls: (v) => (v ? 'g' : 'b') }, { f: 'tds', h: 'DS Tea365', fmt: (v) => (v ? fTr(v) : '—') },
+      { f: 't7', h: 'Loại hình', l: 1 }, { f: 'orders', h: 'Số đơn', fmt: fN }, { f: 'nd', h: 'Số ngày', fmt: fN }, { f: 'ds', h: 'DS ON', fmt: fTr }, { f: 'tea', h: 'Tea365', l: 1, fmt: (v, x) => (v ? (Q ? x.tpat : '✓ ' + (x.tdays || '')) : 'Chưa mua'), cls: (v) => (v ? 'g' : 'b') }, { f: 'tds', h: 'DS Tea365', fmt: (v) => (v ? fTr(v) : '—') },
     ] });
   }
 
