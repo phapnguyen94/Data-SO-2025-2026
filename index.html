@@ -558,6 +558,16 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
           <div class="sp-tablebox"><table class="sp-table" id="mo-l2t" data-source="mcpon_sum" data-row-key="k"></table></div>
         </div>
       </div>
+      <div class="sp-card" id="t7-card">
+        <div class="sp-tools"><h3><span data-ic="target"></span>Tracking Tea365 · 7 loại hình trọng tâm kênh ON</h3></div>
+        <p class="sp-note" id="t7-note"></p>
+        <div class="sp-tiles" id="t7-tiles"></div>
+        <div class="sp-tablebox"><table class="sp-table" id="t7-table" data-source="mcpon_ch" data-row-key="k"></table></div>
+        <div id="t7-wrap" hidden>
+          <div class="sp-tools"><div class="sp-seg" id="t7-seg" role="group" aria-label="Trạng thái Tea365"></div><input class="sp-search" id="t7-search" type="search" placeholder="Tìm mã / tên KH / ĐDKD" aria-label="Tìm KH"></div>
+          <div class="sp-tablebox" style="max-height:480px"><table class="sp-table" id="t7-ch" data-source="mcpon_ch" data-row-key="k"></table></div>
+        </div>
+      </div>
       <div class="sp-card">
         <div class="sp-tools"><h3><span data-ic="users"></span>SS → ĐDKD → khách hàng ON</h3><div class="sp-crumb" id="mo-crumb"></div></div>
         <p class="sp-note">Bấm dòng Team SS Pháp để xổ ĐDKD, bấm ĐDKD để xem từng quầy ON với số đơn và ngày đặt đơn.</p>
@@ -1606,6 +1616,57 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     }
   }
 
+
+  // ---- Tracking Tea365 theo 7 loại hình trọng tâm kênh ON (T10.2026)
+  const T7 = ['Canteen', 'Giải trí', 'Máy bán hàng tự động', 'Quán nước', 'Quốc lộ', 'Thể thao', 'Vận chuyển hành khách'];
+  function t7Type(x) {
+    const n = String(x.name || '').toLowerCase();
+    if (/máy bán hàng|máy bán nước|vending/.test(n)) return 'Máy bán hàng tự động';
+    if (/thể thao|gym|fitness|yoga|sân bóng|sân cầu|pickleball|tennis/.test(n)) return 'Thể thao';
+    if (/quốc lộ|\bql ?\d|trạm dừng|tdc/.test(n)) return 'Quốc lộ';
+    if (/căn tin|canteen|cantin|nhà ăn/.test(n) || x.l2 === 'Suất ăn công nghiệp') return 'Canteen';
+    if (x.l2 === 'Giải trí') return 'Giải trí';
+    if (x.l2 === 'Quán nước') return 'Quán nước';
+    if (x.l2 === 'Vận chuyển hành khách') return 'Vận chuyển hành khách';
+    return null;
+  }
+  function renderT7(CHd, M, ML, Q) {
+    if (!CHd) return;
+    const who = scope();
+    const all = CHd.filter((x) => x.m === M && (who === TEAM || x.ddkd === who)).map((x) => ({ ...x, t7: t7Type(x) })).filter((x) => x.t7);
+    document.getElementById('t7-note').textContent = '7 loại hình theo mục tiêu KPI kênh ON T10: ' + T7.join(' · ') + '. Phân loại: theo L2 trong MCP ON (Giải trí, Quán nước, Vận chuyển hành khách, Suất ăn công nghiệp → Canteen) và theo tên KH (căn tin/canteen, gym/thể thao, quốc lộ/trạm dừng chân, máy bán hàng). MCP ON hiện chưa có quầy nào tên Quốc lộ / Máy bán hàng nên 2 loại này = 0 (Anh gắn L2 hoặc đổi tên KH thì tự nhảy vào). "Có Tea365" = quầy có đơn Tea365 trong ' + ML + '.';
+    const tot = all.length, act = all.filter((x) => x.act).length, tea = all.filter((x) => x.tea).length;
+    const tds = d3.sum(all, (x) => x.tds || 0);
+    const tiles = document.getElementById('t7-tiles'); tiles.replaceChildren();
+    tiles.append(
+      tile({ icon: 'store', name: 'Quầy thuộc 7 loại hình', value: fN(tot), subs: [{ label: 'active', text: fN(act) + ' (' + fP(tot ? act / tot : null, 0) + ')' }] }),
+      tile({ icon: 'zap', name: 'Đã mua Tea365', value: fN(tea), meter: tot ? tea / tot : 0, subs: [{ chip: 'acc', text: fP(tot ? tea / tot : null, 0) + ' quầy 7 loại hình' }, { label: 'DS Tea365', text: fTr(tds) }] }),
+      tile({ icon: 'alert', name: 'Chưa mua Tea365', value: fN(tot - tea), subs: [{ label: 'đã active nhưng chưa Tea', text: fN(all.filter((x) => x.act && !x.tea).length) }, { label: 'chưa có đơn', text: fN(all.filter((x) => !x.act).length) }] })
+    );
+    const rows = T7.map((t) => {
+      const z = all.filter((x) => x.t7 === t), a = z.filter((x) => x.act).length, c = z.filter((x) => x.tea).length;
+      return { k: t, t7: t, mcp: z.length, act: a, tea: c, noTea: z.length - c, actNoTea: z.filter((x) => x.act && !x.tea).length, rate: z.length ? c / z.length : null, tds: d3.sum(z, (x) => x.tds || 0) };
+    });
+    if (!S.sort.t7) S.sort.t7 = { f: 'mcp', dir: 'desc' };
+    table(document.getElementById('t7-table'), { id: 't7', key: 'k', rows, sel: (x) => x.t7 === S.t7Sel, onClick: (x) => { S.t7Sel = S.t7Sel === x.t7 ? null : x.t7; render(); }, cols: [
+      { f: 't7', h: 'Loại hình', l: 1 }, { f: 'mcp', h: 'Quầy MCP ON', fmt: fN }, { f: 'act', h: 'Active', fmt: fN }, { f: 'tea', h: 'Đã mua Tea365', fmt: fN, cls: (v) => (v ? 'g' : 'mut') },
+      { f: 'rate', h: '% Tea365/quầy', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 },
+      { f: 'noTea', h: 'Chưa mua Tea365', fmt: fN, cls: (v) => (v ? 'b' : 'mut') }, { f: 'actNoTea', h: 'Active chưa Tea365', fmt: fN }, { f: 'tds', h: 'DS Tea365', fmt: fTr },
+    ] });
+    const wrap = document.getElementById('t7-wrap'); wrap.hidden = !S.t7Sel;
+    if (!S.t7Sel) return;
+    S.t7F = S.t7F || 'Tất cả';
+    const sg = document.getElementById('t7-seg'); sg.replaceChildren();
+    ['Tất cả', 'Có Tea365', 'Chưa Tea365'].forEach((v) => { const b = el('button', '', v); b.type = 'button'; b.setAttribute('aria-pressed', String(S.t7F === v)); b.addEventListener('click', () => { S.t7F = v; render(); }); sg.appendChild(b); });
+    let r2 = all.filter((x) => x.t7 === S.t7Sel && (S.t7F === 'Tất cả' || (S.t7F === 'Có Tea365') === !!x.tea));
+    r2 = searchFilter(r2, 't7', ['code', 'name', 'ddkd']);
+    if (!S.sort.t7ch) S.sort.t7ch = { f: 'tea', dir: 'asc' };
+    table(document.getElementById('t7-ch'), { id: 't7ch', key: 'k', rows: r2, cols: [
+      { f: 'code', h: 'Mã KH', l: 1 }, { f: 'name', h: 'Tên KH', l: 1 }, { f: 'ddkd', h: 'ĐDKD', l: 1 }, { f: 'l2', h: 'L2', l: 1 }, { f: 'ward', h: 'Phường', l: 1 },
+      { f: 'orders', h: 'Số đơn', fmt: fN }, { f: 'tea', h: 'Tea365', l: 1, fmt: (v, x) => (v ? (Q ? x.tpat : '✓ ' + (x.tdays || '')) : 'Chưa mua'), cls: (v) => (v ? 'g' : 'b') }, { f: 'tds', h: 'DS Tea365', fmt: (v) => (v ? fTr(v) : '—') },
+    ] });
+  }
+
   function renderMcpOn() {
     const SM = D('mcpon_sum'), CHd = D('mcpon_ch');
     if (!SM) return;
@@ -1676,6 +1737,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       ...(Q ? [] : [{ f: '_rep', h: '% ≥2 ngày', fmt: (v) => (isN(v) ? fP(v, 0) : '—') }]), { f: 'orders', h: 'Số đơn', fmt: fN }, { f: 'ds', h: 'DS ON', fmt: fTr },
       { f: 'tea', h: 'Mua Tea365', fmt: fN }, { f: 'tea_rate', h: '% Tea/MCP', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 }, { f: 'tea_ds', h: 'DS Tea365', fmt: fTr },
     ] });
+    try { renderT7(CHd, M, ML, Q); } catch (e) { console.error(e); }
     crumb(document.getElementById('mo-crumb'), S.moSel, () => { S.moSel = null; render(); });
     const wrap = document.getElementById('mo-wrap'); const who = S.moSel || (S.dd || null);
     wrap.hidden = !(who && CHd);
