@@ -147,6 +147,25 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
 .sp .sp-tabs button[aria-selected="true"]{border-image:linear-gradient(90deg,#3a68c4,#ee6a10) 1}
 .sp .sp-tile:before{content:"";position:absolute;left:14px;right:14px;top:0;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(58,104,196,.9),rgba(238,106,16,.9));opacity:.55}
 .sp .sp-card h3 [data-ic] svg,.sp .sp-card h3 svg{color:var(--o-acc)}
+
+/* ===== Nhấn mạnh chỉ tiêu / còn thiếu / kết quả ===== */
+.sp .sp-table th.emph-gap{color:#ffb27a;box-shadow:inset 0 -2px 0 var(--o-acc)}
+.sp .sp-table th.emph-tg{color:#9dbcf5;box-shadow:inset 0 -2px 0 #3a68c4}
+.sp .sp-table th.emph-rs{color:var(--o-fg);box-shadow:inset 0 -2px 0 var(--o-good)}
+.sp .sp-table td.emph{font-weight:700}
+.sp .sp-table td.emph-gap{background:rgba(238,106,16,.10);color:#ffb27a}
+.sp .sp-table td.emph-tg{background:rgba(58,104,196,.12);color:#c3d5fa}
+.sp .sp-table td.emph-rs{background:rgba(67,211,158,.06)}
+.sp .sp-table tr.team td.emph-gap,.sp .sp-table tr.sel td.emph-gap{background:rgba(238,106,16,.2)}
+.sp .sp-tile.emph-gap{border-color:rgba(238,106,16,.65);box-shadow:0 0 0 1px rgba(238,106,16,.25) inset}
+.sp .sp-tile.emph-gap .big{color:#ffa45c}
+.sp .sp-tile.emph-rs .big{color:#fff}
+.sp .sp-tile.emph-rs{border-color:rgba(58,104,196,.55)}
+.sp .sub .emph-chip{padding:1px 8px;border-radius:999px;font-weight:700;color:var(--o-fg)}
+.sp .sub .emph-chip.gap{background:rgba(238,106,16,.2);color:#ffb27a}
+.sp .sub .emph-chip.tg{background:rgba(58,104,196,.22);color:#b8cdf6}
+.sp .sub .emph-chip b{color:inherit}
+.sp mark.emph-mark{background:rgba(238,106,16,.22);color:#ffb27a;font-weight:700;padding:0 5px;border-radius:5px}
 </style></head><body><div id="dash-root">
 <div class="sp" id="sp">
   <header class="sp-head" id="top">
@@ -1928,6 +1947,25 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
   }
 
   /* ---------- main render ---------- */
+  function emphasize() {
+    const GAP = /còn thiếu|còn lại|thiếu ds|gap|cần\/ngày|cần thêm/i, TG = /chỉ tiêu|nền tảng|\bct\b|target/i, RS = /đạt thưởng|% đạt|% nền tảng|% ct|% th|% ds|đạt ct/i;
+    root.querySelectorAll('.sp-panel:not([hidden]) table.sp-table:not(.sp-mx)').forEach((tb) => {
+      const hr = tb.querySelector('thead tr:last-child'); if (!hr) return;
+      [...hr.children].forEach((th, i) => {
+        const t = th.textContent; const c = GAP.test(t) ? 'emph-gap' : TG.test(t) ? 'emph-tg' : RS.test(t) ? 'emph-rs' : '';
+        if (!c) return; th.classList.add('emph', c);
+        tb.querySelectorAll('tbody tr').forEach((tr) => { const td = tr.children[i]; if (td) td.classList.add('emph', c); });
+      });
+    });
+    const RX = /(cần [\d.,]+ ?(?:tr|tỷ)(?:\/ngày)?|còn thiếu [\d.,]+ ?(?:tr|tỷ|CH|KH)?|còn lại [\d.,]+ ?(?:tr|tỷ|ngày)?|\d[\d.,]*% CT|đạt [\d.,]+% CT)/g;
+    root.querySelectorAll('#hero, .sp-panel:not([hidden]) .sp-insight').forEach((n) => { if (n.querySelector('mark')) return; const h = n.innerHTML; const r = h.replace(RX, '<mark class="emph-mark">$1</mark>'); if (r !== h) n.innerHTML = r; });
+    root.querySelectorAll('.sp-panel:not([hidden]) .sp-tile').forEach((t) => {
+      const nm = (t.querySelector('.name') || {}).textContent || '';
+      if (GAP.test(nm)) t.classList.add('emph-gap'); else if (RS.test(nm) || TG.test(nm)) t.classList.add('emph-rs');
+      t.querySelectorAll('.sub > *').forEach((x) => { if (GAP.test(x.textContent)) x.classList.add('emph-chip', 'gap'); else if (TG.test(x.textContent)) x.classList.add('emph-chip', 'tg'); });
+    });
+  }
+
   function render() {
     root.querySelectorAll('#f-month button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.m) === S.m)));
     document.getElementById('f-prev').textContent = S.m === 7 ? 'T6 (DS, ASO)' : S.m === 10 ? 'T9 (cả tháng)' : 'T' + (S.m - 1);
@@ -1945,6 +1983,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     try {
       ({ overview: renderOverview, hv: renderHV, ops: renderOps, prog: () => { renderProg(); renderComboOn(); }, ytd: renderYTD, ape: renderAPE, mcpon: renderMcpOn, mcpoff: renderMcpOff, rr: renderRR, act: renderAct })[S.tab]();
     } catch (e) { console.error(e); throw e; }
+    try { emphasize(); } catch (e) { console.error(e); }
   }
   window.__spRender = render;
   dash.onData(render);
