@@ -166,6 +166,17 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
 .sp .sub .emph-chip.tg{background:rgba(58,104,196,.22);color:#b8cdf6}
 .sp .sub .emph-chip b{color:inherit}
 .sp mark.emph-mark{background:rgba(238,106,16,.22);color:#ffb27a;font-weight:700;padding:0 5px;border-radius:5px}
+
+/* nhóm phân loại HV nổi bật */
+.sp #gap-tiles{grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr))}
+.sp .gp-tile{--gc:#8d8782;border-width:1.5px;border-color:var(--gc);padding-top:18px;background:linear-gradient(180deg,rgba(255,255,255,.05),var(--o-panel))}
+.sp .gp-tile:before{height:6px!important;left:0!important;right:0!important;top:0!important;border-radius:0!important;opacity:1!important;background:var(--gc)!important}
+.sp .gp-tile.gp-A{--gc:#f2a20d}.sp .gp-tile.gp-B{--gc:#4f86e8}.sp .gp-tile.gp-C{--gc:#43d39e}.sp .gp-tile.gp-D{--gc:#ff5d5d}.sp .gp-tile.gp-DAT{--gc:#43d39e}
+.sp .gp-tile .name{color:#f4f1ec;font-weight:700;font-size:12.5px}
+.sp .gp-tile .big{font-size:clamp(2.6rem,4.2vw,3.4rem)!important;font-weight:800;color:var(--gc)!important;line-height:1}
+.sp .gp-tile .ic{border-color:var(--gc);color:var(--gc);background:transparent}
+.sp .gp-tile .sub{font-size:12.5px}
+.sp .gp-tile .sub .emph-chip.gap{font-size:13px;background:rgba(238,106,16,.28);color:#ffc08f}
 </style></head><body><div id="dash-root">
 <div class="sp" id="sp">
   <header class="sp-head" id="top">
@@ -1155,7 +1166,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     if (S.gapGrp === undefined) S.gapGrp = null;
     if (h) {
       const mk = (g, icon) => { const t = tile({ icon, name: names[g], value: fN(h['n_' + g]), src: 'hv_gap_sum', field: 'n_' + g, where: 'k=' + enc(h.k), subs: [{ chip: g === 'DAT' ? 'acc' : 'warn', text: fP(h['pct_' + g], 0) + ' HV' }, { label: 'DS thực', text: fTr(h['ds_' + g]) }, { label: 'Còn thiếu DS', text: fTr(h['gap_' + g]) }] });
-        t.style.cursor = 'pointer'; if (S.gapGrp === g) t.style.outline = '2px solid var(--o-acc)'; t.addEventListener('click', () => { S.gapGrp = S.gapGrp === g ? null : g; render(); }); return t; };
+        t.classList.add('gp-tile', 'gp-' + g); t.style.cursor = 'pointer'; if (S.gapGrp === g) t.style.outline = '2px solid var(--o-acc)'; t.addEventListener('click', () => { S.gapGrp = S.gapGrp === g ? null : g; render(); }); return t; };
       tiles.append(mk('A', 'money'), mk('B', 'layers'), mk('C', 'target'), mk('D', 'trend'), mk('DAT', 'award'));
     }
     const rows = G.filter((r) => r.m === S.m).sort((a, b) => (a.ddkd === TEAM ? -1 : b.n_C - a.n_C));
