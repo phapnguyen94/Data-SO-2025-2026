@@ -1617,6 +1617,8 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       const cell = (r) => { const td = el('td'); if (!r || !isN(r[F.y])) { td.textContent = '—'; td.className = 'mut'; return td; }
         const v = r[F.y]; const s = el('span', 'sp-pill ' + (v < -0.05 ? 'r' : v < 0.1 ? 'y' : 'gr'), fPS(v, 0)); td.appendChild(s);
         td.addEventListener('mousemove', (e) => showTip(e, r.ward + ' · ' + r.label, [F.h1 + ': ' + fTr(r[F.a]), F.h2 + ': ' + fTr(r[F.b]), '± ' + fTrS(r[F.a] - r[F.b])])); td.addEventListener('mouseleave', hideTip); return td; };
+      { const tr = el('tr'); const tc = el('td', 'l', 'Tổng'); tc.style.fontWeight = '700'; tr.appendChild(tc); const agg = (z, lab) => { const a = d3.sum(z, (r) => r[F.a] || 0), b = d3.sum(z, (r) => r[F.b] || 0); return { ward: 'Tổng', label: lab, [F.a]: a, [F.b]: b, [F.y]: b > 0 ? a / b - 1 : null }; };
+        ngs.forEach((n) => tr.appendChild(cell(agg(mine.filter((r) => r.lvl === 'ng' && r.label === n), n)))); const tt0 = cell(agg(wards, 'Tổng')); tt0.style.fontWeight = '700'; tr.appendChild(tt0); tb.appendChild(tr); }
       wards.forEach((w) => { const tr = el('tr'); tr.appendChild(el('td', 'l', w.ward)); ngs.forEach((n) => tr.appendChild(cell(mine.find((r) => r.lvl === 'ng' && r.parent === w.ward && r.label === n)))); const tt = cell(w); tt.style.fontWeight = '700'; tr.appendChild(tt); tb.appendChild(tr); });
       mx.replaceChildren(th, tb);
     }
@@ -1645,7 +1647,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
         rows.push(n);
         if (S.asoExp[n.nganh]) mine.filter((r) => r.lvl === 'brand' && r.parent === n.nganh).sort((a, b) => b._a26 - a._a26).forEach((b) => { rows.push(b); if (S.asoExpB[n.nganh + '|' + b.label]) mine.filter((r) => r.lvl === 'dms' && r.nganh === n.nganh && r.parent === b.label).sort((x, y) => y._a26 - x._a26).forEach((d) => rows.push(d)); });
       });
-      const lab = { f: 'label', h: 'Ngành → Nhãn hàng → DMS_OBJ', l: 1, fmt: (v, r) => (r.lvl === 'nganh' ? (S.asoExp[r.nganh] ? '▾ ' : '▸ ') + v : r.lvl === 'brand' ? '\u2003' + (S.asoExpB[r.nganh + '|' + r.label] ? '▾ ' : '▸ ') + v : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'nganh' ? '' : 'mut') };
+      const lab = { f: 'label', h: 'Ngành → Nhãn hàng → DMS_OBJ', l: 1, fmt: (v, r) => (r.lvl === 'nganh' ? (S.asoExp[r.nganh] ? '▾ ' : '▸ ') + v : r.lvl === 'brand' ? '\u2003' + (S.asoExpB[r.nganh + '|' + r.label] ? '▾ ' : '▸ ') + v : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'nganh' || r.lvl === 'tot' ? '' : 'mut') };
       const click = (r) => { if (r.lvl === 'nganh') { S.asoExp[r.nganh] = !S.asoExp[r.nganh]; render(); } else if (r.lvl === 'brand') { const kk = r.nganh + '|' + r.label; S.asoExpB[kk] = !S.asoExpB[kk]; render(); } };
       table(document.getElementById('aso-ng-sum'), { id: 'asos', key: 'k', rows, pin: { f: 'label', v: 'Tổng' }, noSort: 1, onClick: click, cols: [
         lab, { f: '_a26', h: AP === 'ytd' ? 'CH mua T1–T9' : 'ASO ' + PL, fmt: fN }, { f: '_a25', h: PB, fmt: fN }, { f: '_d', h: 'Δ ' + PL, fmt: fNS, cls: sgnCls }, { f: '_yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
@@ -1668,9 +1670,11 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       });
       const drows = [];
       dng.sort((a, b) => b._s26 - a._s26).forEach((n) => { drows.push(n); if (S.dsExp[n.nganh]) dmine.filter((r) => r.lvl === 'brand' && r.parent === n.nganh).sort((a, b) => b._s26 - a._s26).forEach((b) => { drows.push({ ...b, _sh: n._s26 ? b._s26 / n._s26 : null }); if (S.dsExpB[n.nganh + '|' + b.label]) dmine.filter((r) => r.lvl === 'dms' && r.nganh === n.nganh && r.parent === b.label).sort((x, y) => y._s26 - x._s26).forEach((d) => drows.push({ ...d, _sh: b._s26 ? d._s26 / b._s26 : null })); }); });
-      const dlab = { f: 'label', h: 'Ngành → Nhãn hàng → DMS_OBJ', l: 1, fmt: (v, r) => (r.lvl === 'nganh' ? (S.dsExp[r.nganh] ? '▾ ' : '▸ ') + v : r.lvl === 'brand' ? '\u2003' + (S.dsExpB[r.nganh + '|' + r.label] ? '▾ ' : '▸ ') + v : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'nganh' ? '' : 'mut') };
+      const dlab = { f: 'label', h: 'Ngành → Nhãn hàng → DMS_OBJ', l: 1, fmt: (v, r) => (r.lvl === 'tot' ? v : r.lvl === 'nganh' ? (S.dsExp[r.nganh] ? '▾ ' : '▸ ') + v : r.lvl === 'brand' ? '\u2003' + (S.dsExpB[r.nganh + '|' + r.label] ? '▾ ' : '▸ ') + v : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'nganh' ? '' : 'mut') };
       const sy = (v) => (isN(v) ? fPS(v, 0) : '—');
-      table(document.getElementById('ds-ng-sum'), { id: 'dsng', key: 'k', rows: drows, noSort: 1, onClick: (r) => { if (r.lvl === 'nganh') { S.dsExp[r.nganh] = !S.dsExp[r.nganh]; render(); } else if (r.lvl === 'brand') { const kk = r.nganh + '|' + r.label; S.dsExpB[kk] = !S.dsExpB[kk]; render(); } }, cols: [
+      { const sm = (f) => d3.sum(dng, (r) => r[f] || 0); const T = { k: 'Tổng', lvl: 'tot', label: 'Tổng', _s26: sm('_s26'), _s25: sm('_s25'), _sh: 1 }; T._sd = T._s26 - T._s25; T._sy = T._s25 > 0 ? T._s26 / T._s25 - 1 : null;
+        [7, 8, 9].forEach((m) => { const x = sm('s26_' + m), y = sm('s25_' + m); T['_sy' + m] = y > 0 ? x / y - 1 : null; }); drows.unshift(T); }
+      table(document.getElementById('ds-ng-sum'), { id: 'dsng', key: 'k', rows: drows, pin: { f: 'label', v: 'Tổng' }, noSort: 1, onClick: (r) => { if (r.lvl === 'nganh') { S.dsExp[r.nganh] = !S.dsExp[r.nganh]; render(); } else if (r.lvl === 'brand') { const kk = r.nganh + '|' + r.label; S.dsExpB[kk] = !S.dsExpB[kk]; render(); } }, cols: [
         dlab, { f: '_s26', h: 'DS ' + DL + '/26', fmt: fTr }, { f: '_s25', h: DL + '/25', fmt: fTr }, { f: '_sd', h: '± tiền', fmt: fTrS, cls: sgnCls }, { f: '_sy', h: '± %', fmt: sy, cls: sgnCls, pill: 1 },
         ...(AP === 'q3' ? [7, 8, 9].map((m) => ({ f: '_sy' + m, h: '± T' + m, fmt: sy, cls: sgnCls })) : []), { f: '_sh', h: 'Tỷ trọng', fmt: (v) => (isN(v) ? fP(v, 0) : '') },
       ] });
@@ -1731,7 +1735,8 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       return { k: t, t7: t, mcp: z.length, act: a, tea: c, noTea: z.length - c, actNoTea: z.filter((x) => x.act && !x.tea).length, rate: z.length ? c / z.length : null, tds: d3.sum(z, (x) => x.tds || 0) };
     });
     if (!S.sort.t7) S.sort.t7 = { f: 'mcp', dir: 'desc' };
-    table(document.getElementById('t7-table'), { id: 't7', key: 'k', rows, sel: (x) => x.t7 === S.t7Sel, onClick: (x) => { S.t7Sel = S.t7Sel === x.t7 ? null : x.t7; render(); }, cols: [
+    { const sm = (f) => d3.sum(rows, (r) => r[f] || 0); rows.unshift({ k: 'Tổng', t7: 'Tổng', mcp: sm('mcp'), act: sm('act'), tea: sm('tea'), noTea: sm('noTea'), actNoTea: sm('actNoTea'), rate: sm('mcp') ? sm('tea') / sm('mcp') : null, tds: sm('tds') }); }
+    table(document.getElementById('t7-table'), { id: 't7', key: 'k', pin: { f: 't7', v: 'Tổng' }, rows, sel: (x) => x.t7 === S.t7Sel, onClick: (x) => { if (x.t7 === 'Tổng') return; S.t7Sel = S.t7Sel === x.t7 ? null : x.t7; render(); }, cols: [
       { f: 't7', h: 'Loại hình', l: 1 }, { f: 'mcp', h: 'Quầy MCP ON', fmt: fN }, { f: 'act', h: 'Active', fmt: fN }, { f: 'tea', h: 'Đã mua Tea365', fmt: fN, cls: (v) => (v ? 'g' : 'mut') },
       { f: 'rate', h: '% Tea365/quầy', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 },
       { f: 'noTea', h: 'Chưa mua Tea365', fmt: fN, cls: (v) => (v ? 'b' : 'mut') }, { f: 'actNoTea', h: 'Active chưa Tea365', fmt: fN }, { f: 'tds', h: 'DS Tea365', fmt: fTr },
@@ -1773,7 +1778,8 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       return { k: t, t7: t, mcp: z.length, act: z.filter((x) => x.act).length, tea: c, noTea: z.length - c, rate: z.length ? c / z.length : null, tds: d3.sum(z, (x) => x.tds || 0) };
     });
     if (!S.sort.t7l) S.sort.t7l = { f: 'mcp', dir: 'desc' };
-    table(document.getElementById('t7l-table'), { id: 't7l', key: 'k', rows, sel: (x) => x.t7 === S.t7lSel, onClick: (x) => { S.t7lSel = S.t7lSel === x.t7 ? null : x.t7; S.t7lScroll = 1; render(); }, cols: [
+    { const sm = (f) => d3.sum(rows, (r) => r[f] || 0); rows.unshift({ k: 'Tổng', t7: 'Tổng', mcp: sm('mcp'), act: sm('act'), tea: sm('tea'), noTea: sm('noTea'), rate: sm('mcp') ? sm('tea') / sm('mcp') : null, tds: sm('tds') }); }
+    table(document.getElementById('t7l-table'), { id: 't7l', key: 'k', pin: { f: 't7', v: 'Tổng' }, rows, sel: (x) => x.t7 === S.t7lSel, onClick: (x) => { if (x.t7 === 'Tổng') return; S.t7lSel = S.t7lSel === x.t7 ? null : x.t7; S.t7lScroll = 1; render(); }, cols: [
       { f: 't7', h: 'Loại hình L2', l: 1 }, { f: 'mcp', h: 'Quầy trong MCP', fmt: fN }, { f: 'act', h: 'Active', fmt: fN }, { f: 'tea', h: 'Có mua Tea365', fmt: fN, cls: (v) => (v ? 'g' : 'mut') },
       { f: 'rate', h: '% Tea365/MCP', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.6 ? 'g' : v >= 0.4 ? 'w' : 'b'), pill: 1 }, { f: 'noTea', h: 'Chưa mua Tea365', fmt: fN, cls: (v) => (v ? 'b' : 'mut') }, { f: 'tds', h: 'DS Tea365', fmt: fTr },
     ] });
