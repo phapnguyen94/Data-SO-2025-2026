@@ -1507,9 +1507,10 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     box.hidden = false;
     const ms = q3 ? [7, 8, 9] : t9 ? [YM] : [1, 2, 3, 4, 5, 6, 7, 8, 9], who = scope();
     const sumM = (arr) => ms.reduce((a, m) => a + (arr[m - 1] || 0), 0) * 1000;
+    const tyMap = new Map(); (D('outlets') || []).slice().sort((x, y) => x.m - y.m).forEach((x) => { const t = String(x.type || '').toUpperCase(); tyMap.set(x.id, TKT.includes(t) ? t : 'LẺ'); });
     const byId = new Map();
     KH.filter((r) => (sel.w === 'Tổng' || r.w === sel.w) && (sel.g === 'Tổng' || r.g === sel.g) && (who === TEAM || r.d === who)).forEach((r) => {
-      let o = byId.get(r.id); if (!o) { o = { k: r.id, id: r.id, n: r.n, ddkd: r.d, ward: r.w, a: 0, b: 0, gg: {} }; byId.set(r.id, o); }
+      let o = byId.get(r.id); if (!o) { o = { k: r.id, id: r.id, n: r.n, ty: tyMap.get(r.id) || 'LẺ', ddkd: r.d, ward: r.w, a: 0, b: 0, gg: {} }; byId.set(r.id, o); }
       const a = sumM(r.a), b = sumM(r.b); o.a += a; o.b += b; o.gg[r.g] = (o.gg[r.g] || 0) + (a - b);
     });
     let all = Array.from(byId.values()).filter((o) => o.a || o.b).map((o) => ({ ...o, gap: o.a - o.b, yoy: o.b > 0 ? o.a / o.b - 1 : null, st: o.a <= 0 && o.b > 0 ? 'Mất đơn' : o.b <= 0 && o.a > 0 ? 'KH mới' : o.a < o.b ? 'Giảm' : 'Tăng/đều', gw: sel.g === 'Tổng' ? Object.entries(o.gg).filter((e) => e[1] < 0).sort((x, y) => x[1] - y[1]).map((e) => e[0]).slice(0, 3).join(', ') : '' }));
@@ -1525,10 +1526,10 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     head.append(h3, sg); box.appendChild(head);
     box.appendChild(el('p', 'sp-note', fN(neg.length) + '/' + fN(all.length) + ' KH giảm DS (' + fN(lost.length) + ' KH mất đơn hẳn) · giảm ' + fTr(-negSum) + ' · bù bằng KH tăng ' + fTr(posSum) + ' · ròng ' + fTrS(sumA - sumB) + '. Bấm lại ô đang chọn để đóng.'));
     let rows = (S.mxNeg ? neg : all);
-    const T = { k: 'Tổng', id: '', n: S.mxNeg ? 'Tổng KH âm' : 'Tổng', ddkd: '', ward: '', a: d3.sum(rows, (o) => o.a), b: d3.sum(rows, (o) => o.b), gw: '', st: '' }; T.gap = T.a - T.b; T.yoy = T.b > 0 ? T.a / T.b - 1 : null;
+    const T = { k: 'Tổng', id: '', n: S.mxNeg ? 'Tổng KH âm' : 'Tổng', ty: '', ddkd: '', ward: '', a: d3.sum(rows, (o) => o.a), b: d3.sum(rows, (o) => o.b), gw: '', st: '' }; T.gap = T.a - T.b; T.yoy = T.b > 0 ? T.a / T.b - 1 : null;
     if (!S.sort.mxkh) S.sort.mxkh = { f: 'gap', dir: 'asc' };
     const wrap = el('div', 'sp-tablebox'); const tb = el('table', 'sp-table'); tb.id = 'mx-kh-table'; wrap.appendChild(tb); box.appendChild(wrap);
-    const cs = [{ f: 'id', h: 'Mã KH', l: 1 }, { f: 'n', h: 'Tên KH', l: 1 }, { f: 'ddkd', h: 'ĐDKD', l: 1 }, ...(sel.w === 'Tổng' ? [{ f: 'ward', h: 'Phường', l: 1 }] : []),
+    const cs = [{ f: 'id', h: 'Mã KH', l: 1 }, { f: 'n', h: 'Tên KH', l: 1 }, { f: 'ty', h: 'Type KH', l: 1, fmt: (v) => (v ? TKL[v] : ''), cls: (v) => (v && v !== 'LẺ' ? 'a' : 'mut') }, { f: 'ddkd', h: 'ĐDKD', l: 1 }, ...(sel.w === 'Tổng' ? [{ f: 'ward', h: 'Phường', l: 1 }] : []),
       { f: 'a', h: 'DS ' + PLB + '/2026', fmt: fTr }, { f: 'b', h: PLB + '/2025', fmt: fTr }, { f: 'gap', h: '± tiền', fmt: fTrS, cls: sgnCls }, { f: 'yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls, pill: 1 },
       { f: 'st', h: 'Tình trạng', l: 1, cls: (v) => (v === 'Mất đơn' ? 'b' : v === 'Giảm' ? 'w' : '') }, ...(sel.g === 'Tổng' ? [{ f: 'gw', h: 'Ngành giảm nhiều nhất', l: 1, wrap: 1, cls: () => 'b' }] : [])];
     table(tb, { id: 'mxkh', key: 'k', rows: [T, ...rows], pin: { f: 'k', v: 'Tổng' }, cols: cs });
