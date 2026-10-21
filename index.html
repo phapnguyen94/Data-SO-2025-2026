@@ -482,6 +482,11 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
         <div class="sp-tablebox"><table class="sp-table" id="tk-table" data-source="outlets" data-row-key="k"></table></div>
         <h4 class="sp-sub" style="margin:14px 0 6px" id="tk-dd-title"></h4>
         <div class="sp-tablebox"><table class="sp-table" id="tk-dd" data-source="outlets" data-row-key="k"></table></div>
+        <h4 class="sp-sub" style="margin:14px 0 4px" id="tk-miss-title"></h4>
+        <p class="sp-note">KM 1T / 2T / 3T = số quầy (trong MCP T10) không có đơn trong đúng 1, 2 hoặc cả 3 tháng T7, T8, T9. Bảng trên gồm cả Lẻ; bảng ĐDKD bên dưới chỉ VIP3, VIP5, VIPSI.</p>
+        <div class="sp-tablebox"><table class="sp-table" id="tk-miss" data-source="outlets" data-row-key="k"></table></div>
+        <h4 class="sp-sub" style="margin:14px 0 6px">Quầy VIP3 · VIP5 · VIPSI không mua theo ĐDKD</h4>
+        <div class="sp-tablebox"><table class="sp-table" id="tk-miss-dd" data-source="outlets" data-row-key="k"></table></div>
       </div>
     </section>
 
@@ -1443,34 +1448,54 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
   const TKT = ['VIP3', 'VIP5', 'VIPSI', 'LẺ'], TKL = { VIP3: 'VIP3', VIP5: 'VIP5', VIPSI: 'VIPSI', 'LẺ': 'Lẻ (trống)' };
   function renderTypeKH() {
     const OT = D('outlets'); if (!OT) return;
-    S.tkM = S.tkM || 10;
+    if (S.tkM == null) S.tkM = 10;
     const sg = document.getElementById('tk-seg'); sg.replaceChildren();
-    [7, 8, 9, 10].forEach((m) => { const b = el('button', '', 'T' + m + (m === 10 ? '*' : '')); b.type = 'button'; b.setAttribute('aria-pressed', String(S.tkM === m)); b.addEventListener('click', () => { S.tkM = m; render(); }); sg.appendChild(b); });
-    const who = scope(), M = S.tkM;
+    [7, 8, 9, 10, 0].forEach((m) => { const b = el('button', '', m === 0 ? 'BQ T7–T9' : 'T' + m + (m === 10 ? '*' : '')); b.type = 'button'; b.setAttribute('aria-pressed', String(S.tkM === m)); b.addEventListener('click', () => { S.tkM = m; render(); }); sg.appendChild(b); });
+    const who = scope(), M = S.tkM, ML = M ? 'T' + M : 'BQ T7–T9';
     const typ = (x) => (TKT.includes(String(x.type || '').toUpperCase()) ? String(x.type).toUpperCase() : 'LẺ');
     const base = OT.filter((x) => who === TEAM || x.ddkd === who).map((x) => ({ ...x, tp: typ(x) }));
     const agg = (z) => { const a = z.filter((x) => x.ds > 0); return { mcp: new Set(z.map((x) => x.id)).size, aso: a.length, ds: d3.sum(z, (x) => x.ds) }; };
-    const byM = (m, t) => agg(base.filter((x) => x.m === m && (!t || x.tp === t)));
+    const byM1 = (m, t) => agg(base.filter((x) => x.m === m && (!t || x.tp === t)));
+    const byM = (m, t) => { if (m) return byM1(m, t); const L = [7, 8, 9].map((q) => byM1(q, t)); return { mcp: d3.mean(L, (a) => a.mcp), aso: d3.mean(L, (a) => a.aso), ds: d3.mean(L, (a) => a.ds) }; };
     document.getElementById('tk-note').textContent = 'Type KH theo cột Type trong MCP (VIP3, VIP5, VIPSI; ô trống = Lẻ). Gồm quầy OFF + ON của ' + (who === TEAM ? 'Team SS Pháp' : who) + '. ASO = quầy có đơn (trừ đơn hủy) trong tháng; DS = thành tiền trước CK. T10* tính đến 20/10.';
     const tot = byM(M), tiles = document.getElementById('tk-tiles'); tiles.replaceChildren();
-    TKT.forEach((t) => { const a = byM(M, t); tiles.append(tile({ icon: t === 'LẺ' ? 'store' : 'award', name: TKL[t] + ' · T' + M, value: fTr(a.ds), subs: [{ label: 'ASO / MCP', text: fN(a.aso) + ' / ' + fN(a.mcp) + ' (' + fP(a.mcp ? a.aso / a.mcp : null, 0) + ')' }, { label: 'tỷ trọng DS', text: fP(tot.ds ? a.ds / tot.ds : null, 0) }] })); });
-    const rows = TKT.map((t) => { const r = { k: t, tp: TKL[t] }; [7, 8, 9, 10].forEach((m) => { const a = byM(m, t); r['mcp' + m] = a.mcp; r['aso' + m] = a.aso; r['ds' + m] = a.ds; }); const a = byM(M, t); r.pct = a.mcp ? a.aso / a.mcp : null; r.share = tot.ds ? a.ds / tot.ds : null; r.dsq = a.aso ? a.ds / a.aso : null; return r; });
-    const trow = { k: 'Tổng', tp: 'Tổng' }; [7, 8, 9, 10].forEach((m) => { const a = byM(m); trow['mcp' + m] = a.mcp; trow['aso' + m] = a.aso; trow['ds' + m] = a.ds; }); trow.pct = tot.mcp ? tot.aso / tot.mcp : null; trow.share = 1; trow.dsq = tot.aso ? tot.ds / tot.aso : null;
+    TKT.forEach((t) => { const a = byM(M, t); tiles.append(tile({ icon: t === 'LẺ' ? 'store' : 'award', name: TKL[t] + ' · ' + ML, value: fTr(a.ds), subs: [{ label: 'ASO / MCP', text: fN(a.aso) + ' / ' + fN(a.mcp) + ' (' + fP(a.mcp ? a.aso / a.mcp : null, 0) + ')' }, { label: 'tỷ trọng DS', text: fP(tot.ds ? a.ds / tot.ds : null, 0) }] })); });
+    const rows = TKT.map((t) => { const r = { k: t, tp: TKL[t] }; r.mcp0 = byM(0, t).mcp; r.aso0 = byM(0, t).aso; r.ds0 = byM(0, t).ds; [7, 8, 9, 10].forEach((m) => { const a = byM(m, t); r['mcp' + m] = a.mcp; r['aso' + m] = a.aso; r['ds' + m] = a.ds; }); const a = byM(M, t); r.pct = a.mcp ? a.aso / a.mcp : null; r.share = tot.ds ? a.ds / tot.ds : null; r.dsq = a.aso ? a.ds / a.aso : null; return r; });
+    const trow = { k: 'Tổng', tp: 'Tổng' }; { const a0 = byM(0); trow.mcp0 = a0.mcp; trow.aso0 = a0.aso; trow.ds0 = a0.ds; } [7, 8, 9, 10].forEach((m) => { const a = byM(m); trow['mcp' + m] = a.mcp; trow['aso' + m] = a.aso; trow['ds' + m] = a.ds; }); trow.pct = tot.mcp ? tot.aso / tot.mcp : null; trow.share = 1; trow.dsq = tot.aso ? tot.ds / tot.aso : null;
     if (!S.sort.tk) S.sort.tk = { f: 'ds' + M, dir: 'desc' };
-    const cols = [{ f: 'tp', h: 'Type KH', l: 1 }, { f: 'mcp' + M, h: 'Quầy MCP T' + M, fmt: fN }, { f: 'aso' + M, h: 'ASO T' + M, fmt: fN, cls: () => 'g' }, { f: 'pct', h: '% ASO/MCP', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.8 ? 'g' : v >= 0.6 ? 'w' : 'b'), pill: 1 },
-      { f: 'ds' + M, h: 'DS T' + M, fmt: fTr }, { f: 'share', h: '% tỷ trọng DS', fmt: (v) => fP(v, 0) }, { f: 'dsq', h: 'DS / ASO', fmt: fTr }];
+    const cols = [{ f: 'tp', h: 'Type KH', l: 1 }, { f: 'mcp' + M, h: 'Quầy MCP ' + ML, fmt: fN }, { f: 'aso' + M, h: 'ASO ' + ML, fmt: fN, cls: () => 'g' }, { f: 'pct', h: '% ASO/MCP', fmt: (v) => (isN(v) ? fP(v, 0) : '—'), cls: (v) => (v >= 0.8 ? 'g' : v >= 0.6 ? 'w' : 'b'), pill: 1 },
+      { f: 'ds' + M, h: 'DS ' + ML, fmt: fTr }, { f: 'share', h: '% tỷ trọng DS', fmt: (v) => fP(v, 0) }, { f: 'dsq', h: 'DS / ASO', fmt: fTr }];
     [7, 8, 9, 10].filter((m) => m !== M).forEach((m) => { cols.push({ f: 'aso' + m, h: 'ASO T' + m, fmt: fN }, { f: 'ds' + m, h: 'DS T' + m, fmt: fTr }); });
     table(document.getElementById('tk-table'), { id: 'tk', key: 'k', rows: [trow, ...rows], pin: { f: 'k', v: 'Tổng' }, cols });
     // theo ĐDKD
-    document.getElementById('tk-dd-title').textContent = 'Chi tiết theo ĐDKD · T' + M + ' (DS và ASO từng nhóm Type KH)';
+    document.getElementById('tk-dd-title').textContent = 'Chi tiết theo ĐDKD · ' + ML + ' (DS và ASO từng nhóm Type KH' + (M ? '' : ', bình quân/tháng') + ')';
     const names = Array.from(new Set(OT.map((x) => x.ddkd))).sort();
-    const ddRow = (nm, z) => { const r = { k: nm, ddkd: nm }; const a = agg(z); r.mcp = a.mcp; r.aso = a.aso; r.ds = a.ds; TKT.forEach((t) => { const b = agg(z.filter((x) => x.tp === t)); r['a_' + t] = b.aso; r['m_' + t] = b.mcp; r['d_' + t] = b.ds; }); return r; };
-    const all = OT.filter((x) => x.m === M).map((x) => ({ ...x, tp: typ(x) }));
+    const aggZ = (z) => (M ? agg(z.filter((x) => x.m === M)) : (() => { const L = [7, 8, 9].map((q) => agg(z.filter((x) => x.m === q))); return { mcp: d3.mean(L, (a) => a.mcp), aso: d3.mean(L, (a) => a.aso), ds: d3.mean(L, (a) => a.ds) }; })());
+    const ddRow = (nm, z) => { const r = { k: nm, ddkd: nm }; const a = aggZ(z); r.mcp = a.mcp; r.aso = a.aso; r.ds = a.ds; TKT.forEach((t) => { const b = aggZ(z.filter((x) => x.tp === t)); r['a_' + t] = b.aso; r['m_' + t] = b.mcp; r['d_' + t] = b.ds; }); return r; };
+    const all = OT.filter((x) => (M ? x.m === M : [7, 8, 9].includes(x.m))).map((x) => ({ ...x, tp: typ(x) }));
     const dd = [ddRow(TEAM, all), ...names.map((n) => ddRow(n, all.filter((x) => x.ddkd === n)))];
     if (!S.sort.tkdd) S.sort.tkdd = { f: 'ds', dir: 'desc' };
     const c2 = [{ f: 'ddkd', h: 'ĐDKD', l: 1, fmt: (v) => (v === TEAM ? 'Team SS Pháp' : v) }, { f: 'mcp', h: 'MCP', fmt: fN }, { f: 'aso', h: 'ASO', fmt: fN }, { f: 'ds', h: 'DS', fmt: fTr }];
     TKT.forEach((t) => c2.push({ f: 'd_' + t, h: 'DS ' + TKL[t], fmt: fTr }, { f: 'a_' + t, h: 'ASO ' + TKL[t] + ' /MCP', fmt: (v, x) => fN(v) + ' / ' + fN(x['m_' + t]) }));
     table(document.getElementById('tk-dd'), { id: 'tkdd', key: 'k', rows: dd, pin: { f: 'ddkd', v: TEAM }, cols: c2 });
+    // quầy không mua 1/2/3 tháng (T7-T9), MCP T10 hiện tại
+    const cur = new Map(); OT.filter((x) => x.m === 10).forEach((x) => { if (!cur.has(x.id)) cur.set(x.id, { ...x, tp: typ(x) }); });
+    const buy = new Map(); OT.filter((x) => [7, 8, 9].includes(x.m) && x.ds > 0).forEach((x) => { if (!buy.has(x.id)) buy.set(x.id, new Set()); buy.get(x.id).add(x.m); });
+    const q = Array.from(cur.values()).filter((x) => who === TEAM || x.ddkd === who).map((x) => ({ ...x, miss: 3 - (buy.has(x.id) ? buy.get(x.id).size : 0) }));
+    const mrow = (nm, z) => { const r = { k: nm, nm, tot: z.length }; [0, 1, 2, 3].forEach((n) => { r['n' + n] = z.filter((x) => x.miss === n).length; }); r.pc = z.length ? (r.n1 + r.n2 + r.n3) / z.length : null; return r; };
+    const mT = TKT.map((t) => mrow(TKL[t], q.filter((x) => x.tp === t)));
+    const mTot = mrow('Tổng', q);
+    document.getElementById('tk-miss-title').textContent = 'Quầy MCP không mua trong T7–T9 · theo nhóm Type KH' + (who === TEAM ? '' : ' · ' + who);
+    const mc = [{ f: 'nm', h: 'Type KH', l: 1 }, { f: 'tot', h: 'Quầy MCP T10', fmt: fN }, { f: 'n0', h: 'Mua đủ 3 tháng', fmt: fN, cls: () => 'g' }, { f: 'n1', h: 'Không mua 1 tháng', fmt: fN }, { f: 'n2', h: 'Không mua 2 tháng', fmt: fN }, { f: 'n3', h: 'Không mua cả 3 tháng', fmt: fN, cls: (v) => (v > 0 ? 'b' : '') }, { f: 'pc', h: '% quầy bỏ ≥1 tháng', fmt: (v) => (isN(v) ? fP(v, 0) : '—') }];
+    if (!S.sort.tkms) S.sort.tkms = { f: 'tot', dir: 'desc' };
+    table(document.getElementById('tk-miss'), { id: 'tkms', key: 'k', rows: [mTot, ...mT], pin: { f: 'nm', v: 'Tổng' }, cols: mc });
+    const mnames = Array.from(new Set(Array.from(cur.values()).map((x) => x.ddkd))).sort();
+    const vv = (z) => { const o = {}; [1, 2, 3].forEach((n) => { o[n] = z.filter((x) => x.miss === n).length; }); return o; };
+    const dRow = (nm, z) => { const r = { k: nm, ddkd: nm, tot: z.filter((x) => x.tp !== 'LẺ').length }; TKT.slice(0, 3).forEach((t) => { const o = vv(z.filter((x) => x.tp === t)); r['m1_' + t] = o[1]; r['m2_' + t] = o[2]; r['m3_' + t] = o[3]; r['v_' + t] = o[1] + o[2] + o[3]; r['c_' + t] = z.filter((x) => x.tp === t).length; }); return r; };
+    const ddm = [dRow(TEAM, Array.from(cur.values()).map((x) => ({ ...x, miss: 3 - (buy.has(x.id) ? buy.get(x.id).size : 0) }))), ...mnames.map((n) => dRow(n, Array.from(cur.values()).filter((x) => x.ddkd === n).map((x) => ({ ...x, miss: 3 - (buy.has(x.id) ? buy.get(x.id).size : 0) }))))];
+    const c3 = [{ f: 'ddkd', h: 'ĐDKD', l: 1, fmt: (v) => (v === TEAM ? 'Team SS Pháp' : v) }];
+    TKT.slice(0, 3).forEach((t) => c3.push({ f: 'c_' + t, h: TKL[t] + ' MCP', fmt: fN }, { f: 'm1_' + t, h: TKL[t] + ' · KM 1T', fmt: fN }, { f: 'm2_' + t, h: TKL[t] + ' · KM 2T', fmt: fN }, { f: 'm3_' + t, h: TKL[t] + ' · KM 3T', fmt: fN }));
+    table(document.getElementById('tk-miss-dd'), { id: 'tkmd', key: 'k', rows: ddm, pin: { f: 'ddkd', v: TEAM }, cols: c3 });
   }
 
   function renderYTD() {
