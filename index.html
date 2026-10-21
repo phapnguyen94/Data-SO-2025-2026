@@ -1548,7 +1548,11 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       } else rows = mineN.filter((r) => r.m === (NP === 'm' ? YM : 0) && (r.ct > 0 || r.ds26 > 0));
       if (!S.sort.ytdng) S.sort.ytdng = { f: 'th', dir: 'desc' };
       const pc = (v) => (isN(v) ? fP(v, 0) : '—');
-      table(document.getElementById('ytd-ng'), { id: 'ytdng', key: 'k', rows, cols: [
+      { const sm = (f, z) => d3.sum(z, (r) => r[f] || 0); const T = { k: 'Tổng', nganh: 'Tổng', ct: sm('ct', rows), th: sm('th', rows), ds26: sm('ds26', rows), ds25: sm('ds25', rows) };
+        T.pct = T.ct > 0 ? T.th / T.ct : null; T.yoy = T.ds25 > 0 ? T.ds26 / T.ds25 - 1 : null;
+        if (NP === 'q3') [7, 8, 9].forEach((m) => { const z = mineN.filter((r) => r.m === m && (r.ct > 0 || r.ds26 > 0)); const c = sm('ct', z), t = sm('th', z), a = sm('ds26', z), b = sm('ds25', z); T['p' + m] = c > 0 ? t / c : null; T['y' + m] = b > 0 ? a / b - 1 : null; });
+        rows = rows.slice(); S._ngTot = T; }
+      table(document.getElementById('ytd-ng'), { id: 'ytdng', key: 'k', rows: [S._ngTot, ...rows], pin: { f: 'nganh', v: 'Tổng' }, cols: [
         { f: 'nganh', h: 'Ngành hàng', l: 1 }, { f: 'ct', h: 'CT ' + NL, fmt: fTr }, { f: 'th', h: 'TH ' + NL, fmt: fTr }, { f: 'pct', h: '% CT', fmt: pc, cls: pctCls, pill: 1 },
         ...(NP === 'q3' ? [7, 8, 9].map((m) => ({ f: 'p' + m, h: '% CT T' + m, fmt: pc, cls: pctCls })) : []),
         { f: 'ds26', h: 'DS ' + NL + '/2026', fmt: fTr }, { f: 'ds25', h: NL + '/2025', fmt: fTr }, { f: 'yoy', h: '± cùng kỳ', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
@@ -1585,9 +1589,16 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
           if (dd.length) { rows.push({ k: w.ward + '-hdd', lvl: 'hdr', label: 'Theo ĐDKD' }); dd.forEach((r) => rows.push(r)); }
         }
       });
+      { const W = mine.filter((r) => r.lvl === 'ward'), sm = (f) => d3.sum(W, (r) => r[f] || 0);
+        const T = { k: 'Tổng', lvl: 'tot', label: 'Tổng', n_ch: sm('n_ch'), _shq: 1, share: 1, _ngd: '' };
+        T[F.a] = sm(F.a); T[F.b] = sm(F.b); T[F.y] = T[F.b] > 0 ? T[F.a] / T[F.b] - 1 : null;
+        [7, 8, 9].forEach((m) => { const a = sm('t' + m + '_26'), b = sm('t' + m + '_25'); T['_y' + m] = b > 0 ? a / b - 1 : null; });
+        T['aso' + YM + '_26'] = sm('aso' + YM + '_26'); T['d_aso' + YM] = sm('d_aso' + YM);
+        T._asoq26 = sm('_asoq26'); T._dasoq = sm('_dasoq');
+        rows.unshift(T); }
       rows.forEach((r) => { r._gap = isN(r[F.a]) ? r[F.a] - r[F.b] : null; });
-      table(document.getElementById('ward-table'), { id: 'ward', key: 'k', rows, noSort: 1, onClick: (r) => { if (r.lvl === 'ward') { S.wardOpen[r.ward] = !S.wardOpen[r.ward]; render(); } }, cols: [
-        { f: 'label', h: 'Phường → ngành / ĐDKD', l: 1, fmt: (v, r) => (r.lvl === 'ward' ? (S.wardOpen[r.ward] ? '▾ ' : '▸ ') + v : r.lvl === 'hdr' ? '\u2003' + v.toUpperCase() : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'hdr' ? 'a' : r.lvl === 'ward' ? '' : 'mut') },
+      table(document.getElementById('ward-table'), { id: 'ward', key: 'k', rows, pin: { f: 'label', v: 'Tổng' }, noSort: 1, onClick: (r) => { if (r.lvl === 'ward') { S.wardOpen[r.ward] = !S.wardOpen[r.ward]; render(); } }, cols: [
+        { f: 'label', h: 'Phường → ngành / ĐDKD', l: 1, fmt: (v, r) => (r.lvl === 'tot' ? v : r.lvl === 'ward' ? (S.wardOpen[r.ward] ? '▾ ' : '▸ ') + v : r.lvl === 'hdr' ? '\u2003' + v.toUpperCase() : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'hdr' ? 'a' : r.lvl === 'ward' || r.lvl === 'tot' ? '' : 'mut') },
         { f: 'n_ch', h: 'Số CH', fmt: (v) => (isN(v) ? fN(v) : '') }, { f: F.a, h: F.h1, fmt: (v) => (isN(v) ? fTr(v) : '') }, { f: F.b, h: F.h2, fmt: (v) => (isN(v) ? fTr(v) : '') },
         { f: F.y, h: '± cùng kỳ', fmt: (v) => (isN(v) ? fPS(v, 0) : ''), cls: sgnCls, pill: 1 }, { f: '_gap', h: '± tiền', fmt: (v) => (isN(v) ? fTrS(v) : ''), cls: sgnCls },
         ...(q3 ? [7, 8, 9].map((m) => ({ f: '_y' + m, h: '± T' + m, fmt: (v) => (isN(v) ? fPS(v, 0) : ''), cls: sgnCls })) : [{ f: 'mom' + YM, h: TM + ' vs T' + (YM - 1), fmt: (v) => (isN(v) ? fPS(v, 0) : ''), cls: sgnCls }]),
@@ -1636,7 +1647,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       });
       const lab = { f: 'label', h: 'Ngành → Nhãn hàng → DMS_OBJ', l: 1, fmt: (v, r) => (r.lvl === 'nganh' ? (S.asoExp[r.nganh] ? '▾ ' : '▸ ') + v : r.lvl === 'brand' ? '\u2003' + (S.asoExpB[r.nganh + '|' + r.label] ? '▾ ' : '▸ ') + v : '\u2003\u2003↳ ' + v), cls: (v, r) => (r.lvl === 'nganh' ? '' : 'mut') };
       const click = (r) => { if (r.lvl === 'nganh') { S.asoExp[r.nganh] = !S.asoExp[r.nganh]; render(); } else if (r.lvl === 'brand') { const kk = r.nganh + '|' + r.label; S.asoExpB[kk] = !S.asoExpB[kk]; render(); } };
-      table(document.getElementById('aso-ng-sum'), { id: 'asos', key: 'k', rows, noSort: 1, onClick: click, cols: [
+      table(document.getElementById('aso-ng-sum'), { id: 'asos', key: 'k', rows, pin: { f: 'label', v: 'Tổng' }, noSort: 1, onClick: click, cols: [
         lab, { f: '_a26', h: AP === 'ytd' ? 'CH mua T1–T9' : 'ASO ' + PL, fmt: fN }, { f: '_a25', h: PB, fmt: fN }, { f: '_d', h: 'Δ ' + PL, fmt: fNS, cls: sgnCls }, { f: '_yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
         { f: '_pen', h: 'Độ phủ ' + PL, fmt: (v) => (isN(v) ? fP(v, 0) : '—') }, ...(AP === 'ytd' ? [] : [{ f: 'a26_ytd', h: 'CH mua T1–T9', fmt: fN }, { f: 'a25_ytd', h: 'Cùng kỳ', fmt: fN }, { f: 'd_ytd', h: 'Δ', fmt: fNS, cls: sgnCls }]),
       ] });
@@ -1667,12 +1678,12 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
       if (AP === 'q3') {
         rows.forEach((r) => [7, 8, 9].forEach((m) => { r['_dm' + m] = (r['a26_' + m] || 0) - (r['a25_' + m] || 0); }));
         const qc = [7, 8, 9].flatMap((m) => [{ f: 'a26_' + m, h: 'T' + m + '/26', fmt: fN }, { f: 'a25_' + m, h: 'T' + m + '/25', fmt: (v) => fN(v || 0), cls: () => 'mut' }, { f: '_dm' + m, h: 'Δ T' + m, fmt: fNS, cls: sgnCls }]);
-        table(document.getElementById('aso-ng-month'), { id: 'asom', key: 'k', rows, noSort: 1, onClick: click, cols: [
+        table(document.getElementById('aso-ng-month'), { id: 'asom', key: 'k', rows, pin: { f: 'label', v: 'Tổng' }, noSort: 1, onClick: click, cols: [
           lab, ...qc, { f: '_a26', h: 'TB Q3/26', fmt: fN }, { f: '_a25', h: 'TB Q3/25', fmt: fN }, { f: '_d', h: 'Δ TB Q3', fmt: fNS, cls: sgnCls }, { f: '_yoy', h: '± %', fmt: (v) => (isN(v) ? fPS(v, 0) : '—'), cls: sgnCls },
         ] });
       } else {
       const mc = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((m) => ({ f: 'a26_' + m, h: 'T' + m, fmt: fN }));
-      table(document.getElementById('aso-ng-month'), { id: 'asom', key: 'k', rows, noSort: 1, onClick: click, cols: [
+      table(document.getElementById('aso-ng-month'), { id: 'asom', key: 'k', rows, pin: { f: 'label', v: 'Tổng' }, noSort: 1, onClick: click, cols: [
         lab, ...mc, { f: 'a26_avg', h: 'TB 2026', fmt: (v) => fD(v, 0) }, { f: 'a25_avg', h: 'TB 2025', fmt: (v) => fD(v, 0) }, { f: '_a25', h: PB, fmt: fN }, { f: '_d', h: 'Δ ' + PL, fmt: fNS, cls: sgnCls },
       ] });
       }
@@ -2137,7 +2148,7 @@ html,body{margin:0;background:#050505}body{padding:12px max(12px,env(safe-area-i
     if (T) {
       const rows = [];
       T.filter((x) => x.ddkd === scope()).forEach((g) => { rows.push(g); if (!S.dd && S.tdG === g.g) T.filter((x) => x.g === g.g && x.ddkd !== TEAM).sort((a, b) => b.ds_q26 - a.ds_q26).forEach((x) => rows.push(x)); });
-      table(document.getElementById('td-table'), { id: 'td', key: 'k', rows, noSort: 1, sel: (x) => x.ddkd !== TEAM && x.ddkd === S.tdD && x.g === S.tdG,
+      table(document.getElementById('td-table'), { id: 'td', key: 'k', rows, pin: { f: 'label', v: 'Tổng' }, noSort: 1, sel: (x) => x.ddkd !== TEAM && x.ddkd === S.tdD && x.g === S.tdG,
         onClick: (x) => { if (x.ddkd === scope()) { S.tdG = S.tdG === x.g && !S.dd ? null : x.g; S.tdD = S.dd || null; } else { S.tdD = S.tdD === x.ddkd ? null : x.ddkd; } render(); },
         cols: [
           { f: 'grp', h: 'Nhóm → ĐDKD', l: 1, fmt: (v, x) => (x.ddkd === scope() ? (S.tdG === x.g ? '▾ ' : '▸ ') + v : '\u2003↳ ' + x.ddkd) }, { f: 'n', h: 'Số CH', fmt: fN }, { f: 'vip', h: 'VIP', fmt: fN }, { f: 'ds_q26', h: 'DS T7–T9', fmt: fTr }, { f: 'share_ds', h: '% DS', fmt: (v) => fP(v, 0) }, { f: 'avg_m', h: 'BQ/CH/tháng', fmt: fTr },
