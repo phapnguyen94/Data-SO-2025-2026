@@ -2296,4 +2296,18 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
   if (S.tab !== 'overview') dash.setLink(S.tab);
 })();
 </script>
+<style id="tt-css">
+html.tt-dark{filter:invert(1) hue-rotate(180deg);background:#fff}
+html.tt-dark img,html.tt-dark video,html.tt-dark canvas,html.tt-dark picture{filter:invert(1) hue-rotate(180deg)}
+#tt-btn{position:fixed;right:14px;bottom:14px;z-index:99999;width:42px;height:42px;border-radius:50%;border:1px solid rgba(0,0,0,.25);background:#fff;color:#222;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:0}
+@media print{#tt-btn{display:none}}
+</style>
+<button id="tt-btn" type="button" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện sáng / tối">🌙</button>
+<script>
+(function(){var K='tt-theme',h=document.documentElement,b=document.getElementById('tt-btn');
+function ap(d){h.classList.toggle('tt-dark',d);b.textContent=d?'☀️':'🌙';}
+var d=false;try{d=localStorage.getItem(K)==='dark'}catch(e){}
+ap(d);
+b.addEventListener('click',function(){d=!d;ap(d);try{localStorage.setItem(K,d?'dark':'light')}catch(e){}});})();
+</script>
 </body></html>
