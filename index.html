@@ -2354,6 +2354,59 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
   if (S.tab !== 'overview') dash.setLink(S.tab);
 })();
 </script>
+<script>(function(){
+ if(window.__pres)return; var P=window.__pres={on:false,i:0,slides:[],cur:null};
+ var EXC=/(ss-scope-controls|welcome|export-dashboard-bar|report-guide|source-trust-strip|section-intro)/;
+ var st=document.createElement('style');st.textContent=
+ '.pres-on{position:fixed!important;right:auto!important;bottom:auto!important;z-index:99990;overflow:auto;padding:22px 34px 60px!important;margin:0!important;max-width:none!important;box-sizing:border-box;align-content:start!important;animation:presin .25s ease}#pres-back{position:fixed;inset:0;z-index:99980;display:none}body.pres-active #pres-back{display:block}@keyframes presin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}'+
+ '#pres-bar{position:fixed;left:0;right:0;top:0;height:60px;z-index:99999;display:none;align-items:center;gap:14px;padding:0 24px;background:linear-gradient(135deg,#e6282f,#f96610);color:#000000;font:600 16px system-ui,sans-serif}'+
+ 'body.pres-active #pres-bar{display:flex}body.pres-active{overflow:hidden}#pres-bar b{font-size:20px;font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pres-bar span{opacity:.9;font-weight:600}'+
+ '#pres-bar button{border:0;border-radius:9px;background:rgba(0,0,0,.22);color:#000000;font:700 15px system-ui,sans-serif;padding:8px 16px;cursor:pointer}#pres-bar button:hover{background:rgba(0,0,0,.38)}#pres-hint{opacity:.8;font-size:13px;font-weight:500}'+
+ '.pres-on .section-focus-button{display:none!important}'+
+ '@media(max-width:700px){#pres-hint{display:none}#pres-bar b{font-size:15px}}';
+ document.head.appendChild(st);
+ var bar=document.createElement('div');bar.id='pres-bar';bar.innerHTML='<b id="pres-title"></b><span id="pres-hint">← → đổi trang · Esc thoát</span><span id="pres-count"></span><button id="pres-prev" type="button">◀</button><button id="pres-next" type="button">▶</button><button id="pres-exit" type="button">✕ Thoát</button>';
+ document.body.appendChild(bar);var back=document.createElement('div');back.id='pres-back';document.body.appendChild(back);
+ function content(){var p=document.querySelector('.sp-panel:not([hidden])');return p}
+ function nav(){return Array.prototype.slice.call(document.querySelectorAll('.sp-tabs button[role=tab]'))}
+ function build(){var c=content();if(!c)return[];return Array.prototype.filter.call(c.children,function(e){
+   if(e.tagName!=='SECTION'&&e.tagName!=='DIV')return false;
+   if(e.hidden||e.offsetHeight<40)return false; return true})}
+ function bg(){var b=getComputedStyle(document.body).backgroundColor;if(!b||b==='rgba(0, 0, 0, 0)')b='#000000';return b}
+ function title(){var t=document.querySelector('.sp-tabs button[aria-selected=true]');return 'Dashboard Team SS Pháp · '+(t?t.textContent.trim():'')}
+ function clear(){if(P.cur){P.cur.classList.remove('pres-on');P.cur.style.removeProperty('background');P.cur.style.removeProperty('zoom');['left','top','width','height'].forEach(function(k){P.cur.style.removeProperty(k)});P.cur=null}}
+ function show(i){clear();P.slides=build();if(!P.slides.length){document.getElementById('pres-count').textContent='';return}
+   P.i=Math.max(0,Math.min(i,P.slides.length-1));var e=P.slides[P.i];P.cur=e;e.classList.add('pres-on');e.style.background=bg();
+   var z0=Math.max(1,Math.min(1.6,window.innerWidth/1150));
+   function fit(z){e.style.zoom=z;e.style.left='0px';e.style.top=(60/z)+'px';e.style.width=(window.innerWidth/z)+'px';e.style.height=((window.innerHeight-60)/z)+'px'}
+   var z=z0;var cap=/(^|\s)cards(\s|$)/.test(e.className)?1.5:1.9;for(var t=Math.max(z0,Math.min(cap,window.innerWidth/800));t>=z0;t=Math.round((t-.1)*100)/100){fit(t);if(e.scrollHeight<=e.clientHeight+2&&e.scrollWidth<=e.clientWidth+2){z=t;break}}
+   fit(z);e.scrollTop=0;document.getElementById('pres-back').style.background=bg();
+   document.getElementById('pres-title').textContent=title();document.getElementById('pres-count').textContent=(P.i+1)+' / '+P.slides.length}
+ function goTab(d,last){var n=nav(),a=n.findIndex(function(x){return x.getAttribute('aria-selected')==='true'});
+   
+   var k=a+d;if(k<0||k>=n.length)return;clear();n[k].click();setTimeout(function(){show(last?9999:0)},700)}
+ function next(){if(P.i<P.slides.length-1)show(P.i+1);else goTab(1,false)}
+ function prev(){if(P.i>0)show(P.i-1);else goTab(-1,true)}
+ function enter(){P.on=true;document.body.classList.add('pres-active');
+   try{var r=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(r&&r.catch)r.catch(function(){})}catch(e){}
+   setTimeout(function(){show(0)},350)}
+ function exit(){P.on=false;clear();document.body.classList.remove('pres-active');
+   try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}
+ document.getElementById('pres-next').onclick=next;document.getElementById('pres-prev').onclick=prev;document.getElementById('pres-exit').onclick=exit;
+ document.addEventListener('keydown',function(e){if(!P.on)return;var k=e.key;
+   if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'){e.preventDefault();next()}
+   else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();prev()}
+   else if(k==='Escape'){exit()}else if(k==='Home'){show(0)}else if(k==='End'){show(9999)}});
+ document.addEventListener('fullscreenchange',function(){if(P.on&&!document.fullscreenElement){/* người dùng thoát fullscreen bằng Esc */exit()}});
+ var ts=null;document.addEventListener('touchstart',function(e){ts=e.touches[0].clientX},{passive:true});
+ document.addEventListener('touchend',function(e){if(!P.on||ts===null)return;var dx=e.changedTouches[0].clientX-ts;if(Math.abs(dx)>80){dx<0?next():prev()}ts=null},{passive:true});
+ window.addEventListener('resize',function(){if(P.on&&P.cur)show(P.i)});
+ try{new MutationObserver(function(){if(P.on&&(!P.cur||!P.cur.isConnected)){clearTimeout(P.t);P.t=setTimeout(function(){show(P.i)},250)}}).observe(document.getElementById('sp'),{childList:true,subtree:true})}catch(e){}
+ P.enter=enter;P.exit=exit;
+ var host=document.querySelector('.sp-bar');
+ if(host&&!document.getElementById('presentToggle')){var b=document.createElement('button');b.id='presentToggle';b.type='button';b.className='sp-chip acc';b.style.cssText='cursor:pointer;margin-left:auto;border:0;font-weight:700';b.title='Trình chiếu từng mục toàn màn hình';b.textContent='▶ Trình chiếu';b.onclick=enter;host.appendChild(b)}
+})();
+</script>
 <style id="tt-css">
 html.tt-dark{filter:invert(1) hue-rotate(180deg);background:#fff}
 html.tt-dark img,html.tt-dark video,html.tt-dark canvas,html.tt-dark picture{filter:invert(1) hue-rotate(180deg)}
