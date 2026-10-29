@@ -2573,13 +2573,13 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
  function content(){var p=document.querySelector('.sp-panel:not([hidden])');return p}
  function nav(){return Array.prototype.slice.call(document.querySelectorAll('.sp-tabs button[role=tab]'))}
  function build(){var c=content();if(!c)return[];return Array.prototype.filter.call(c.children,function(e){
-   if(e.tagName!=='SECTION'&&e.tagName!=='DIV')return false;
+   if(e.tagName!=='SECTION'&&e.tagName!=='DIV')return false; if(/trk-ban|trk-scope/.test(e.className))return false;
    if(e.hidden||e.offsetHeight<40)return false; return true})}
  function bg(){var b=getComputedStyle(document.body).backgroundColor;if(!b||b==='rgba(0, 0, 0, 0)')b='#000000';return b}
  function title(){var t=document.querySelector('.sp-tabs button[aria-selected=true]');return 'Dashboard Team SS Pháp · '+(t?t.textContent.trim():'')}
  function clear(){if(P.cur){P.cur.classList.remove('pres-on');P.cur.style.removeProperty('background');P.cur.style.removeProperty('zoom');['left','top','width','height'].forEach(function(k){P.cur.style.removeProperty(k)});P.cur=null}}
  function show(i){clear();P.slides=build();if(!P.slides.length){document.getElementById('pres-count').textContent='';return}
-   P.i=Math.max(0,Math.min(i,P.slides.length-1));var e=P.slides[P.i];P.cur=e;e.classList.add('pres-on');e.style.background=bg();
+   P.i=Math.max(0,Math.min(i,P.slides.length-1));var e=P.slides[P.i];P.cur=e;e.classList.add('pres-on');if(!/trk-hero/.test(e.className))e.style.background=bg();
    var z0=Math.max(1,Math.min(1.6,window.innerWidth/1150));
    function fit(z){e.style.zoom=z;e.style.left='0px';e.style.top=(60/z)+'px';e.style.width=(window.innerWidth/z)+'px';e.style.height=((window.innerHeight-60)/z)+'px'}
    var z=z0;var cap=/(^|\s)cards(\s|$)/.test(e.className)?1.5:1.9;for(var t=Math.max(z0,Math.min(cap,window.innerWidth/800));t>=z0;t=Math.round((t-.1)*100)/100){fit(t);if(e.scrollHeight<=e.clientHeight+2&&e.scrollWidth<=e.clientWidth+2){z=t;break}}
