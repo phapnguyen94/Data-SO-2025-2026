@@ -2180,7 +2180,8 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
 
 
   function renderAPE() {
-    const A = D('ape');
+    const A0 = D('ape');
+    const A = A0 && (() => { const x = A0.filter((r) => String(r.ss_now).startsWith('Team')).map((r) => (r.k === 'Team Pháp (hiện tại)' ? { ...r, ddkd: TEAM } : r)); const tt = x.find((r) => r.ddkd === TEAM); if (tt && tt.so) x.forEach((r) => { r.share = r.so / tt.so; }); return x; })();
     const key = S.dd || TEAM;
     const a = A && A.find((r) => r.ddkd === key);
     const tiles = document.getElementById('ape-tiles'); tiles.replaceChildren();
