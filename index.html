@@ -198,17 +198,46 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
 @media(max-width:1000px){.sp .sp-head:after{opacity:.14;right:0}}
 
 /* ===== Tracking ngày ===== */
-.trk-kg { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
-.trk-k { border: 1px solid var(--o-line); border-top: 3px solid var(--o-good); border-radius: 12px; padding: 10px 12px; background: var(--o-panel); min-width: 0; }
-.trk-k.w { border-top-color: var(--o-warn); } .trk-k.b { border-top-color: var(--o-bad); } .trk-k.n { border-top-color: var(--o-blue); }
-.trk-k .l { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--o-muted); }
-.trk-k .v { font-size: 26px; font-weight: 800; line-height: 1.15; }
+.trk-hero { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; padding: 22px 28px; border-radius: 18px; color: white; background: linear-gradient(120deg, hsl(358 80% 42%) 0%, hsl(22 90% 48%) 100%); box-shadow: 0 8px 26px hsl(18 85% 45% / .28); }
+.trk-hero .ring { position: relative; width: 150px; height: 150px; }
+.trk-hero .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 34px; font-weight: 800; }
+.trk-hero .ring small { position: absolute; left: 0; right: 0; bottom: 30px; text-align: center; font-size: 11px; opacity: .85; letter-spacing: .08em; }
+.trk-hero h2 { margin: 0; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; opacity: .92; font-weight: 700; }
+.trk-hero .big { font-size: 46px; font-weight: 800; line-height: 1.1; margin: 4px 0 2px; }
+.trk-hero .sub { font-size: 14px; opacity: .92; }
+.trk-hero .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px 18px; margin-top: 14px; }
+.trk-hero .row div { background: hsl(0 0% 100% / .18); border-radius: 12px; padding: 8px 12px; }
+.trk-hero .row small { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; opacity: .85; }
+.trk-hero .row b { font-size: 21px; font-weight: 800; }
+@media (max-width: 720px) { .trk-hero { grid-template-columns: 1fr; text-align: center; } .trk-hero .ring { margin: 0 auto; } .trk-hero .big { font-size: 36px; } }
+.trk-ban { display: flex; align-items: center; gap: 12px; padding: 11px 18px; border-radius: 12px; background: linear-gradient(90deg, hsl(222 70% 28%), hsl(218 62% 44%)); color: white; margin-top: 6px; }
+.trk-ban b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: white; color: hsl(222 70% 28%); font-size: 15px; }
+.trk-ban span { font-weight: 800; letter-spacing: .08em; font-size: 15px; flex: 1; }
+.trk-ban em { font-style: normal; font-size: 12.5px; opacity: .9; }
+.trk-card h3 { font-size: 16px; }
+.trk-tiles .sp-tile .big { font-size: 40px; font-weight: 800; }
+.trk-tiles .sp-tile { border-width: 1.5px; box-shadow: 0 3px 12px hsl(0 0% 0% / .06); }
+.trk-kg { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.trk-k { border: 1px solid var(--o-line); border-left: 6px solid var(--o-good); border-radius: 12px; padding: 12px 14px; background: var(--o-panel); min-width: 0; box-shadow: 0 2px 8px hsl(0 0% 0% / .05); }
+.trk-k.w { border-left-color: var(--o-warn); } .trk-k.b { border-left-color: var(--o-bad); } .trk-k.n { border-left-color: var(--o-blue); }
+.trk-k .l { font-size: 12px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--o-muted); display: flex; justify-content: space-between; gap: 6px; }
+.trk-k .l i { font-style: normal; font-size: 10.5px; padding: 1px 8px; border-radius: 99px; background: var(--o-good); color: white; letter-spacing: .03em; }
+.trk-k.w .l i { background: var(--o-warn); color: hsl(45 100% 8%); } .trk-k.b .l i { background: var(--o-bad); } .trk-k.n .l i { background: var(--o-blue); }
+.trk-k .v { font-size: 34px; font-weight: 800; line-height: 1.12; margin-top: 2px; }
 .trk-k.w .v { color: var(--o-warn); } .trk-k.b .v { color: var(--o-bad); } .trk-k.g .v { color: var(--o-good); }
-.trk-k .s { font-size: 12px; color: var(--o-muted); margin-top: 2px; }
-.trk-sub { margin: 12px 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--o-muted); }
-.trk-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--o-muted); margin-top: 6px; }
-.trk-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
-.trk-svg text { fill: var(--o-muted); font-size: 11px; } .trk-svg .lab { fill: var(--o-fg); font-weight: 700; }
+.trk-k .s { font-size: 12.5px; color: var(--o-muted); margin-top: 3px; } .trk-k .c { font-size: 12px; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--o-line); color: var(--o-muted); } .trk-k .c b { color: var(--o-fg); }
+.trk-k .bar { height: 6px; border-radius: 9px; background: var(--o-line); margin-top: 7px; overflow: hidden; } .trk-k .bar u { display: block; height: 100%; background: var(--o-good); } .trk-k.w .bar u { background: var(--o-warn); } .trk-k.b .bar u { background: var(--o-bad); } .trk-k.n .bar u { background: var(--o-blue); }
+.trk-sub { margin: 16px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--o-fg); padding-left: 10px; border-left: 4px solid var(--o-acc); }
+.trk-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--o-muted); margin-top: 8px; }
+.trk-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.trk-svg text { fill: var(--o-muted); font-size: 12px; } .trk-svg .lab { fill: var(--o-fg); font-weight: 800; }
+.trk-tb { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 900px; }
+.trk-tb th { text-align: right; padding: 9px 10px; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: white; background: hsl(222 70% 28%); white-space: nowrap; }
+.trk-tb th:first-child, .trk-tb td:first-child { text-align: left; }
+.trk-tb td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--o-line); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.trk-tb tbody tr { cursor: pointer; } .trk-tb tbody tr:hover { background: var(--o-accbg); }
+.trk-tb tr.tot td { font-weight: 800; background: var(--o-accbg); border-top: 2px solid var(--o-acc); } .trk-tb tr.sel td { background: var(--o-accbg); font-weight: 700; }
+.trk-tb .p { display: inline-block; min-width: 56px; padding: 2px 8px; border-radius: 99px; font-weight: 800; color: white; background: var(--o-good); } .trk-tb .p.w { background: var(--o-warn); color: hsl(45 100% 8%); } .trk-tb .p.b { background: var(--o-bad); }
 </style></head><body><div id="dash-root">
 <div class="sp" id="sp">
   <header class="sp-head" id="top">
@@ -513,24 +542,30 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
 
     <!-- ============ TRACKING NGÀY ============ -->
     <section class="sp-panel" id="trk" data-panel="trk" hidden>
-      <div class="sp-tiles" id="trk-hvtiles"></div>
-      <div class="sp-card"><h3><span data-ic="award"></span>1.1 Hội viên: thực hiện và chỉ tiêu theo ĐDKD (triệu)</h3>
-        <p class="sp-note" id="trk-hvnote"></p><div class="sp-chart" id="trk-hvbar" style="min-height:340px"></div></div>
-      <div class="sp-card"><h3><span data-ic="users"></span>1.2 % KH hội viên đạt thưởng theo ĐDKD so với trung bình Team</h3>
-        <p class="sp-note">Xanh: từ trung bình Team trở lên · cam: dưới trung bình · đỏ: dưới một nửa trung bình. Số dưới tên = KH đạt / tổng KH hội viên.</p><div class="sp-chart" id="trk-hvpct" style="min-height:260px"></div></div>
-      <div class="sp-tiles" id="trk-tiles"></div>
-      <div class="sp-card"><h3><span data-ic="trend"></span>2.1 Doanh số và số đơn theo ngày <span id="trk-scope" class="sp-chip acc"></span></h3>
-        <div class="sp-chart" id="trk-ds" style="min-height:190px"></div>
-        <div class="sp-chart" id="trk-pc" style="min-height:170px"></div>
-        <div class="sp-chart" id="trk-ch" style="min-height:190px"></div></div>
+      <div class="trk-hero" id="trk-hero"></div>
+      <div class="trk-ban"><b>1</b><span>HỘI VIÊN DOANH NHÂN THEO ĐDKD</span><em id="trk-b1"></em></div>
+      <div class="sp-tiles trk-tiles" id="trk-hvtiles"></div>
+      <div class="sp-card trk-card"><h3>1.1 Thực hiện và chỉ tiêu hội viên theo ĐDKD (triệu đồng)</h3>
+        <p class="sp-note" id="trk-hvnote"></p><div class="sp-chart" id="trk-hvbar" style="min-height:380px"></div></div>
+      <div class="sp-card trk-card"><h3>1.2 % KH hội viên đạt thưởng theo ĐDKD so với trung bình Team</h3>
+        <p class="sp-note">Xanh: từ trung bình Team trở lên · vàng: dưới trung bình · đỏ: dưới một nửa trung bình. Dưới tên = KH đạt / tổng KH hội viên.</p><div class="sp-chart" id="trk-hvpct" style="min-height:280px"></div></div>
+      <div class="trk-ban"><b>2</b><span>XU HƯỚNG BÁN HÀNG THEO NGÀY</span><em id="trk-b2"></em></div>
+      <div class="sp-tiles trk-tiles" id="trk-tiles"></div>
+      <div class="sp-card trk-card"><h3>2.1 Doanh số và số đơn theo ngày</h3>
+        <div class="sp-chart" id="trk-ds" style="min-height:230px"></div>
+        <div class="sp-chart" id="trk-pc" style="min-height:200px"></div>
+        <div class="sp-chart" id="trk-ch" style="min-height:230px"></div></div>
       <div class="sp-grid two">
-        <div class="sp-card"><h3><span data-ic="layers"></span>2.2 Theo ngành hàng (Sub_div)</h3><div class="sp-chart" id="trk-d1" style="min-height:260px"></div></div>
-        <div class="sp-card"><h3><span data-ic="users"></span>2.3 Theo nhóm khách hàng</h3><div class="sp-chart" id="trk-d2" style="min-height:260px"></div></div>
+        <div class="sp-card trk-card"><h3>2.2 Cơ cấu doanh số theo ngành hàng</h3><div class="sp-chart" id="trk-d1" style="min-height:300px"></div></div>
+        <div class="sp-card trk-card"><h3>2.3 Cơ cấu doanh số theo nhóm khách hàng</h3><div class="sp-chart" id="trk-d2" style="min-height:300px"></div></div>
       </div>
-      <div class="sp-card"><h3><span data-ic="gauge"></span>3.1 Doanh số · ASO · Tiến độ</h3><div id="trk-k1"></div></div>
-      <div class="sp-card"><h3><span data-ic="grid"></span>3.2 Tổng kênh · All CAT / −Meat/Bia / Meat</h3><div id="trk-k2"></div></div>
-      <div class="sp-card"><h3><span data-ic="store"></span>3.3 Kênh OFF · All CAT / −Meat/Bia / Meat</h3><div id="trk-k3"></div></div>
-      <div class="sp-card"><h3><span data-ic="zap"></span>3.4 Kênh ON · Total ON / 7 loại hình / BEV (Refreshment Drinks)</h3><div id="trk-k4"></div></div>
+      <div class="trk-ban"><b>3</b><span>THẺ KPI VẬN HÀNH THEO KÊNH</span><em id="trk-b3"></em></div>
+      <div class="sp-card trk-card"><h3>3.1 Doanh số · ASO · Tiến độ</h3><div id="trk-k1"></div></div>
+      <div class="sp-card trk-card"><h3>3.2 Tổng kênh · All CAT / −Meat/Bia / Meat</h3><div id="trk-k2"></div></div>
+      <div class="sp-card trk-card"><h3>3.3 Kênh OFF · All CAT / −Meat/Bia / Meat</h3><div id="trk-k3"></div></div>
+      <div class="sp-card trk-card"><h3>3.4 Kênh ON · Total ON / 7 loại hình / BEV (Refreshment Drinks)</h3><div id="trk-k4"></div></div>
+      <div class="trk-ban"><b>4</b><span>BẢNG TỔNG HỢP THEO ĐDKD</span><em>Bấm một dòng để xem riêng ĐDKD đó</em></div>
+      <div class="sp-card trk-card"><div id="trk-rank" style="overflow-x:auto"></div></div>
     </section>
 
     <!-- ============ APE ============ -->
@@ -2241,13 +2276,13 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     const W = (id) => Math.max(320, box(id).clientWidth || 900);
     chartInto('trk-hvbar', 'trk', (b) => {
       if (!rows.length) return;
-      const w = W('trk-hvbar'), h = 330, mL = 40, mB = 70, mT = 22, n = rows.length, bw = (w - mL - 10) / n, mx = d3.max(rows, (r) => Math.max(r.th, r.ct)) / 1e6 * 1.08;
+      const w = W('trk-hvbar'), h = 380, mL = 40, mB = 70, mT = 40, n = rows.length, bw = (w - mL - 10) / n, mx = d3.max(rows, (r) => Math.max(r.th, r.ct)) / 1e6 * 1.08;
       const y = (v) => mT + (h - mT - mB) * (1 - v / mx); let s = `<svg class="trk-svg" width="100%" viewBox="0 0 ${w} ${h}" height="${h}">`;
       [0, .25, .5, .75, 1].forEach((t) => { const v = mx * t; s += `<line x1="${mL}" x2="${w - 6}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--o-line)"/><text x="${mL - 6}" y="${y(v) + 4}" text-anchor="end">${vi(v, 0)}</text>`; });
       rows.forEach((r, i) => {
         const x0 = mL + i * bw + bw * .14, w2 = bw * .36, ct = r.ct / 1e6, th = r.th / 1e6, pg = M.passed / M.days, c = r.pth >= pg ? 'var(--o-good)' : r.pth >= pg - .1 ? 'var(--o-warn)' : 'var(--o-bad)';
         s += `<rect x="${x0}" y="${y(ct)}" width="${w2}" height="${y(0) - y(ct)}" rx="3" style="fill:var(--o-blue)"/><rect x="${x0 + w2 + 2}" y="${y(th)}" width="${w2}" height="${y(0) - y(th)}" rx="3" style="fill:${c}"/>`;
-        s += `<text class="lab" x="${x0 + w2 + 2 + w2 / 2}" y="${y(th) - 5}" text-anchor="middle" style="font-size:10px">${vi(r.pth * 100, 0)}%</text>`;
+        s += `<text class="lab" x="${x0 + w2 + 2 + w2 / 2}" y="${y(th) - 18}" text-anchor="middle" style="font-size:13px;fill:${c}">${vi(r.pth * 100, 0)}%</text><text x="${x0 + w2 + 2 + w2 / 2}" y="${y(th) - 5}" text-anchor="middle" style="font-size:10.5px">${vi(th, 0)}</text><text x="${x0 + w2 / 2}" y="${y(ct) - 5}" text-anchor="middle" style="font-size:10.5px">${vi(ct, 0)}</text>`;
         const sh = shortN(r.name);
         s += `<text transform="translate(${x0 + w2} ${y(0) + 12}) rotate(40)" text-anchor="start">${sh}</text>`;
       });
@@ -2266,7 +2301,6 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     /* --- thẻ đầu trang --- */
     const tl = box('trk-tiles'); tl.replaceChildren();
     const A = sc.aso, N = sc.nd;
-    box('trk-scope').textContent = sc.name;
     tl.append(
       mkTile('Doanh số thực hiện', fTr(sc.ds), [['trước chiết khấu', N + ' ĐDKD']], 'money'),
       mkTile('Tỷ lệ thực hiện', fP(sc.pct), [['chỉ tiêu', fTr(sc.ct)], ['tiến độ chuẩn', fP(M.passed / M.days)]], 'target', sc.pct),
@@ -2301,20 +2335,39 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     });
     donut('trk-d1', sc.sub); donut('trk-d2', sc.grp);
     /* --- thẻ KPI --- */
-    const K = (l, v, s, c) => `<div class="trk-k ${c || ''}"><div class="l">${l}</div><div class="v">${v}</div>${s ? `<div class="s">${s}</div>` : ''}</div>`;
+    const T0 = Tk.scopes[TEAM], isT = key === TEAM, prg = M.passed / M.days;
+    const CHIP = { g: 'ĐẠT', w: 'GẦN ĐẠT', b: 'CHẬM', n: '' };
+    const K = (l, v, s, c, o) => { o = o || {}; return `<div class="trk-k ${c || ''}"><div class="l"><span>${l}</span>${o.chip === false || !CHIP[c || 'n'] ? '' : `<i>${o.chip || CHIP[c]}</i>`}</div><div class="v">${v}</div>${s ? `<div class="s">${s}</div>` : ''}${o.bar !== undefined ? `<div class="bar"><u style="width:${Math.max(2, Math.min(100, o.bar * 100))}%"></u></div>` : ''}${o.cmp ? `<div class="c">${o.cmp}</div>` : ''}</div>`; };
     const G = (items) => '<div class="trk-kg">' + items.join('') + '</div>';
-    const pcTarget = sc.pct, need = sc.need;
-    box('trk-k1').innerHTML = '<div class="trk-sub">Doanh số · %TH · BQ ngày · VPO KH</div>' + G([
-      K('% TH chỉ tiêu', fP(sc.pct), fTr(sc.ds) + ' / ' + fTr(sc.ct) + ' · tiến độ chuẩn ' + fP(M.passed / M.days), sc.pct >= M.passed / M.days ? 'g' : sc.pct >= (M.passed / M.days) * .9 ? 'w' : 'b'),
-      K('BQ / ngày', fTr(sc.bq), 'cần ' + fTr(sc.need) + '/ngày cho ' + sc.rem + ' ngày còn lại', sc.bq >= sc.need ? 'g' : 'b'),
-      K('VPO KH', fTr(sc.vpo), fTr(sc.ds) + ' / ' + fN(A.tot) + ' KH lấy hàng', 'n')]) +
-      '<div class="trk-sub">ASO · Tổng / OFF / ON (KH có đơn / MCP)</div>' + G([['Tổng', A.tot, sc.mcp.tot], ['OFF', A.off, sc.mcp.off], ['ON', A.on, sc.mcp.on]].map(([l, a, m]) => K('ASO ' + l, fP(a / (m || 1)), fN(a) + ' / ' + fN(m), a / (m || 1) >= .8 ? 'g' : a / (m || 1) >= .6 ? 'w' : 'b')));
-    const trio = (c, names, labs) => '<div class="trk-sub">PC / ngày / ĐDKD</div>' + G(names.map((n, i) => K(labs[i], f1(c[n].pcd), fN(c[n].pc) + ' PC · ' + M.passed + ' ngày', i === 0 ? 'n' : ''))) +
-      '<div class="trk-sub">LPPC (line / PC)</div>' + G(names.map((n, i) => K(labs[i], f2(c[n].lppc), fN(c[n].lines) + ' line / ' + fN(c[n].pc) + ' đơn', c[n].lppc >= (i === 2 ? 3.8 : 4.4) ? 'g' : 'w'))) +
-      '<div class="trk-sub">Giá trị BQ / đơn</div>' + G(names.map((n, i) => K(labs[i], fk(c[n].gt), fTr(c[n].ds) + ' / ' + fN(c[n].pc) + ' đơn', i === 0 ? 'n' : '')));
-    box('trk-k2').innerHTML = trio(sc.cards.all, ['all', 'nomb', 'meat'], ['All CAT', '−Meat/Bia', 'Meat']);
-    box('trk-k3').innerHTML = trio(sc.cards.off, ['all', 'nomb', 'meat'], ['All CAT', '−Meat/Bia', 'Meat']);
-    box('trk-k4').innerHTML = trio(sc.cards.on, ['all', 't7', 'bev'], ['Total ON', '7 loại hình', 'BEV']);
+    const cmpN = (v, t, fmt, d) => { if (isT || !isN(t)) return ''; const dl = v - t; return 'Team: <b>' + fmt(t) + '</b> · ' + (dl >= 0 ? '▲ +' : '▼ ') + fmt(Math.abs(dl) * (dl < 0 ? -1 : 1)).replace('--', '-'); };
+    const cs = (a, m) => { const r = a / (m || 1); return r >= .8 ? 'g' : r >= .6 ? 'w' : 'b'; };
+    const rc = sc.pct >= prg ? 'g' : sc.pct >= prg - .1 ? 'w' : 'b';
+    box('trk-k1').innerHTML = '<div class="trk-sub">Doanh số · % thực hiện · BQ ngày · VPO KH</div>' + G([
+      K('% TH chỉ tiêu', fP(sc.pct), fTr(sc.ds) + ' / ' + fTr(sc.ct), rc, { bar: sc.pct, cmp: 'Tiến độ chuẩn <b>' + fP(prg) + '</b> · ' + (sc.pct >= prg ? 'vượt ' : 'chậm ') + vi(Math.abs(sc.pct - prg) * 100, 1) + ' điểm' }),
+      K('BQ / ngày', fTr(sc.bq), 'cần ' + fTr(sc.need) + '/ngày cho ' + sc.rem + ' ngày còn lại', sc.bq >= sc.need ? 'g' : 'b', { cmp: 'Chênh so với nhịp cần: <b>' + fTrS(sc.bq - sc.need) + '</b>/ngày' }),
+      K('VPO KH', fTr(sc.vpo), fTr(sc.ds) + ' / ' + fN(A.tot) + ' KH lấy hàng', 'n', { cmp: isT ? '' : 'Team: <b>' + fTr(T0.vpo) + '</b>' })]) +
+      '<div class="trk-sub">ASO · KH có đơn / MCP (mốc 80% MCP)</div>' + G([['Tổng', A.tot, sc.mcp.tot, T0.aso.tot, T0.mcp.tot], ['OFF', A.off, sc.mcp.off, T0.aso.off, T0.mcp.off], ['ON', A.on, sc.mcp.on, T0.aso.on, T0.mcp.on]].map(([l, a, m, ta, tm]) => K('ASO ' + l, fP(a / (m || 1)), fN(a) + ' / ' + fN(m) + ' KH', cs(a, m), { bar: a / (m || 1), cmp: m && a / m < .8 ? 'Cần thêm <b>' + fN(Math.max(Math.ceil(.8 * m - a), 0)) + ' KH</b> để đạt mốc 80%' : 'Đã đạt mốc 80% MCP' })));
+    const trio = (c, tc, names, labs) => {
+      const mk = (title, f, sf, cf) => '<div class="trk-sub">' + title + '</div>' + G(names.map((n, i) => K(labs[i], f(c[n]), sf(c[n]), isT ? 'n' : (cf(c[n]) >= cf(tc[n]) ? 'g' : 'w'), { chip: isT ? false : (cf(c[n]) >= cf(tc[n]) ? '≥ TEAM' : '< TEAM'), cmp: isT ? '' : 'Team: <b>' + f(tc[n]) + '</b>' })));
+      return mk('PC / ngày / ĐDKD', (x) => f1(x.pcd), (x) => fN(x.pc) + ' PC · ' + M.passed + ' ngày', (x) => x.pcd) + mk('LPPC (line / PC)', (x) => f2(x.lppc), (x) => fN(x.lines) + ' line / ' + fN(x.pc) + ' đơn', (x) => x.lppc) + mk('Giá trị BQ / đơn', (x) => fk(x.gt), (x) => fTr(x.ds) + ' / ' + fN(x.pc) + ' đơn', (x) => x.gt);
+    };
+    box('trk-k2').innerHTML = trio(sc.cards.all, T0.cards.all, ['all', 'nomb', 'meat'], ['All CAT', '−Meat/Bia', 'Meat']);
+    box('trk-k3').innerHTML = trio(sc.cards.off, T0.cards.off, ['all', 'nomb', 'meat'], ['All CAT', '−Meat/Bia', 'Meat']);
+    box('trk-k4').innerHTML = trio(sc.cards.on, T0.cards.on, ['all', 't7', 'bev'], ['Total ON', '7 loại hình', 'BEV']);
+    /* --- hero + banner + bảng tổng hợp --- */
+    const R = 62, circ = 2 * Math.PI * R, pc0 = Math.min(sc.pct, 1);
+    box('trk-hero').innerHTML = `<div class="ring"><svg viewBox="0 0 150 150" width="150" height="150"><circle cx="75" cy="75" r="${R}" fill="none" style="stroke:hsl(0 0% 100% / .3)" stroke-width="13"/><circle cx="75" cy="75" r="${R}" fill="none" style="stroke:white" stroke-width="13" stroke-linecap="round" stroke-dasharray="${circ * pc0} ${circ}" transform="rotate(-90 75 75)"/></svg><b>${vi(sc.pct * 100, 1)}%</b></div>
+      <div><h2>${sc.name} · Tracking T10/2026 · đến ${M.date.slice(0, 5)} (${M.asof})</h2><div class="big">${fTr(sc.ds)} <span style="font-size:20px;font-weight:600;opacity:.9">/ CT ${fTr(sc.ct)}</span></div>
+      <div class="sub">${sc.pct >= prg ? 'Vượt' : 'Chậm'} tiến độ chuẩn ${fP(prg)} ${vi(Math.abs(sc.pct - prg) * 100, 1)} điểm · còn thiếu ${fTr(Math.max(sc.ct - sc.ds, 0))} trong ${sc.rem} ngày công</div>
+      <div class="row"><div><small>BQ / ngày</small><b>${fTr(sc.bq)}</b></div><div><small>Cần / ngày</small><b>${fTr(sc.need)}</b></div><div><small>ASO tổng</small><b>${fP(A.tot / (sc.mcp.tot || 1), 1)}</b></div><div><small>Số đơn (PC)</small><b>${fN(sc.cards.all.all.pc)}</b></div>${hv ? `<div><small>KH hội viên đạt</small><b>${fN((key === TEAM ? hv : (rows.find((r) => r.name === key) || hv)).ach)}</b></div>` : ''}</div></div>`;
+    box('trk-b1').textContent = hv ? 'Team: ' + fN(hv.ach) + ' / ' + fN(hv.n) + ' KH đạt (' + fP(hv.pct) + ')' : '';
+    box('trk-b2').textContent = sc.name + ' · ngày 1–' + M.today + '/10';
+    box('trk-b3').textContent = sc.name + ' · tiến độ chuẩn ' + fP(prg);
+    const names = M.names, hvm = {}; rows.forEach((r) => { hvm[r.name] = r; });
+    const pill = (v, p) => `<span class="p ${v >= p ? '' : v >= p - .1 ? 'w' : 'b'}">${vi(v * 100, 1)}%</span>`;
+    const body = names.map((n) => Tk.scopes[n]).sort((a, b) => b.pct - a.pct).map((x) => `<tr data-n="${x.name}" class="${S.dd === x.name ? 'sel' : ''}"><td>${x.name}</td><td>${fTr(x.ds)}</td><td>${fTr(x.ct)}</td><td>${pill(x.pct, prg)}</td><td>${fP(x.aso.tot / (x.mcp.tot || 1), 0)}</td><td>${f1(x.cards.all.all.pcd)}</td><td>${f2(x.cards.all.all.lppc)}</td><td>${fk(x.cards.all.all.gt)}</td><td>${hvm[x.name] ? hvm[x.name].ach + '/' + hvm[x.name].n : '—'}</td><td>${hvm[x.name] ? fP(hvm[x.name].pct, 0) : '—'}</td></tr>`).join('');
+    box('trk-rank').innerHTML = `<table class="trk-tb"><thead><tr><th>ĐDKD</th><th>Doanh số</th><th>Chỉ tiêu</th><th>% CT</th><th>ASO</th><th>PC/ngày</th><th>LPPC</th><th>GT BQ/đơn</th><th>HV đạt</th><th>% HV</th></tr></thead><tbody>${body}<tr class="tot"><td>${TEAM}</td><td>${fTr(T0.ds)}</td><td>${fTr(T0.ct)}</td><td>${pill(T0.pct, prg)}</td><td>${fP(T0.aso.tot / (T0.mcp.tot || 1), 0)}</td><td>${f1(T0.cards.all.all.pcd)}</td><td>${f2(T0.cards.all.all.lppc)}</td><td>${fk(T0.cards.all.all.gt)}</td><td>${hv ? hv.ach + '/' + hv.n : '—'}</td><td>${hv ? fP(hv.pct, 0) : '—'}</td></tr></tbody></table>`;
+    box('trk-rank').querySelectorAll('tbody tr[data-n]').forEach((tr) => tr.addEventListener('click', () => { const sel = document.getElementById('f-dd'); sel.value = tr.dataset.n; setDD(tr.dataset.n); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
   }
 
   function renderAPE() {
