@@ -2180,8 +2180,17 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
 
 
   function renderAPE() {
-    const A0 = D('ape');
-    const A = A0 && (() => { const x = A0.filter((r) => String(r.ss_now).startsWith('Team')).map((r) => (r.k === 'Team Pháp (hiện tại)' ? { ...r, ddkd: TEAM } : r)); const tt = x.find((r) => r.ddkd === TEAM); if (tt && tt.so) x.forEach((r) => { r.share = r.so / tt.so; }); return x; })();
+    const A0 = D('ape'); const DU = 'Team SS Dự (đang khóa)';
+    const duOpen = !!S.exp.apeDu;
+    const AA = A0 && (() => {
+      const x = A0.filter((r) => r.ddkd !== 'Tổng APE SS Pháp').map((r) => (r.k === 'Team Pháp (hiện tại)' ? { ...r, ddkd: TEAM } : r.k === 'Nay thuộc SS Dự' ? { ...r, ddkd: DU } : r));
+      const gt = {}; x.filter((r) => r.row === 0).forEach((r) => { gt[r.ss_now === 'Nay thuộc SS Dự' ? 'du' : 'team'] = r.so; });
+      x.forEach((r) => { const t = gt[r.ss_now === 'Nay thuộc SS Dự' || r.ddkd === DU ? 'du' : 'team']; if (t) r.share = r.so / t; });
+      return x;
+    })();
+    const isDu = (r) => r.ddkd === DU || r.ss_now === 'Nay thuộc SS Dự';
+    const A = AA && AA.filter((r) => !isDu(r));
+    const Av = AA && (duOpen ? AA.filter((r) => r.row === 1 || r.ddkd !== DU) : A);
     const key = S.dd || TEAM;
     const a = A && A.find((r) => r.ddkd === key);
     const tiles = document.getElementById('ape-tiles'); tiles.replaceChildren();
@@ -2198,7 +2207,7 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     }
     insights(document.getElementById('ape-ins'), ['ape1', 'ape2']);
     chartInto('ape-chart', 'ape', (box) => {
-      const rows = A.filter((r) => r.row === 1).sort((p, q) => q.pct_e - p.pct_e);
+      const rows = Av.filter((r) => r.row === 1).sort((p, q) => q.pct_e - p.pct_e);
       const w = W(box), rh = 24, mL = 160, mR = 128, mT = 8, h = mT + rows.length * rh + 20;
       const max = d3.max(rows, (r) => Math.max(r.so, r.tg_o)) * 1.04;
       const x = d3.scaleLinear([0, max], [mL, w - mR]);
@@ -2206,7 +2215,7 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
       svg.append('g').selectAll('line').data(x.ticks(4)).join('line').attr('x1', (d) => x(d)).attr('x2', (d) => x(d)).attr('y1', mT).attr('y2', h - 18).attr('stroke', '#d5d5d9');
       svg.append('g').selectAll('text').data(x.ticks(4)).join('text').attr('x', (d) => x(d)).attr('y', h - 4).attr('text-anchor', 'middle').text((d) => fTr(d));
       const g = svg.append('g').selectAll('g').data(rows).join('g').attr('transform', (d, i) => `translate(0,${mT + i * rh})`);
-      const mine = () => true;
+      const mine = (d) => !isDu(d);
       g.append('text').attr('x', mL - 8).attr('y', rh / 2 + 4).attr('text-anchor', 'end').attr('class', (d) => (S.dd === d.ddkd ? 'lab' : '')).text((d) => (mine(d) ? '' : '◦ ') + (d.ddkd.length > 22 ? d.ddkd.slice(0, 21) + '…' : d.ddkd));
       g.append('rect').attr('x', mL).attr('y', 5).attr('height', rh - 10).attr('rx', 4).attr('width', (d) => Math.max(1, x(d.so) - mL)).attr('fill', (d) => (mine(d) ? colorPct(d.pct_e) : '#adadb5'));
       [['tg_e', '#13100b'], ['tg_he', 'var(--o-warn)'], ['tg_o', 'var(--o-acc)']].forEach(([f, c]) => g.append('line').attr('x1', (d) => x(d[f])).attr('x2', (d) => x(d[f])).attr('y1', 2).attr('y2', rh - 2).attr('stroke', c).attr('stroke-width', 2));
@@ -2218,8 +2227,10 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
       legend(box, [{ color: 'var(--o-acc)', label: 'SO lũy kế (màu theo % E)' }, { color: '#13100b', label: 'Mức E', line: 1 }, { color: 'var(--o-warn)', label: 'Mức HE', line: 1 }, { color: 'var(--o-acc)', label: 'Mức O', line: 1 }]);
     });
     if (A) {
-      table(document.getElementById('ape-table'), { id: 'ape', key: 'k', rows: ssRows('ape', A), pin: { f: 'ddkd', v: TEAM }, sel: (r) => r.ddkd === S.dd, onClick: (r) => (r.ddkd === TEAM ? ssClick('ape', r) : setDD(r.ddkd === S.dd ? TEAM : r.ddkd)), cols: [
-        ssCol('ape'), { f: 'so', h: 'Thực hiện T1–T9', fmt: fTr },
+      const duRow = AA.find((r) => r.ddkd === DU);
+      const trows = [...ssRows('ape', A), ...(duRow ? [duRow] : []), ...(duOpen ? AA.filter((r) => r.row === 1 && isDu(r)) : [])];
+      table(document.getElementById('ape-table'), { id: 'ape', key: 'k', rows: trows, pin: { f: 'ddkd', v: TEAM }, sel: (r) => r.ddkd === S.dd, onClick: (r) => (r.ddkd === TEAM ? ssClick('ape', r) : r.ddkd === DU ? (S.exp.apeDu = !S.exp.apeDu, render()) : isDu(r) ? null : setDD(r.ddkd === S.dd ? TEAM : r.ddkd)), cols: [
+        { f: 'ddkd', h: 'SS / ĐDKD', l: 1, fmt: (v) => (v === TEAM ? (isExp('ape') ? '▾ ' : '▸ ') + v : v === DU ? (duOpen ? '▾ ' : '🔒 ') + 'Team SS Dự' : '\u2003↳ ' + v) }, { f: 'so', h: 'Thực hiện T1–T9', fmt: fTr },
         { f: 'tg_e', h: 'CT E', fmt: fTr }, { f: 'pct_e', h: '% E', fmt: (v) => fP(v), cls: pctCls, pill: 1 }, { f: 'gap_e', h: 'Thiếu E', fmt: fTr },
         { f: 'tg_he', h: 'CT HE', fmt: fTr }, { f: 'pct_he', h: '% HE', fmt: (v) => fP(v), cls: pctCls, pill: 1 }, { f: 'gap_he', h: 'Thiếu HE', fmt: fTr },
         { f: 'tg_o', h: 'CT O', fmt: fTr }, { f: 'pct_o', h: '% O', fmt: (v) => fP(v), cls: pctCls, pill: 1 }, { f: 'gap_o', h: 'Thiếu O', fmt: fTr },
