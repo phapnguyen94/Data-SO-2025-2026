@@ -290,6 +290,9 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
 .ach-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
 .ach-d { font-size: 11.5px; font-weight: 700; margin-left: 4px; } .ach-d.u { color: hsl(160 65% 30%); } .ach-d.d { color: hsl(355 74% 44%); }
 .ach-heat td.h { text-align: center; font-weight: 700; padding: 7px 6px; min-width: 62px; }
+.ach-tb tr.lv0 td { background: hsl(222 50% 97%); } .ach-tb tr.lv1 td { background: white; } .ach-tb tr.lv2 td { background: hsl(222 30% 99%); font-size: 12.5px; }
+.ach-tb tr.on td { background: hsl(24 100% 94%); } .ach-tg { display: inline-block; width: 18px; color: hsl(24 90% 45%); font-weight: 800; }
+.ach-tb td.nm { max-width: 420px; }
 </style></head><body><div id="dash-root">
 <div class="sp" id="sp">
   <header class="sp-head" id="top">
@@ -602,21 +605,15 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
       <div class="trk-box"><div class="trk-leg" id="ach-b1n"></div><div class="sp-chart" id="ach-rank" style="min-height:300px"></div></div>
       <div class="trk-ban"><b>2</b><span>KHOAN SÂU NGÀNH HÀNG · CHỈ TIÊU · TỶ TRỌNG</span><em id="ach-b2"></em></div>
       <div class="ach-two" style="grid-template-columns:1fr">
-        <div class="trk-box"><div class="trk-hd">2.1 Chỉ tiêu · thực hiện · tỷ trọng · ASO theo ngành</div><div id="ach-ng" style="overflow-x:auto"></div></div>
+        <div class="trk-box"><div class="trk-hd">2.1 Bảng khoan sâu: bấm ngành để xem nhãn, bấm nhãn để xem SKU</div><div class="ach-q" style="margin:0 0 8px"><button type="button" id="ach-expall">Mở / thu gọn ngành</button><button type="button" id="ach-expbr">Mở tất cả đến SKU</button></div><div id="ach-ng" style="overflow-x:auto"></div></div>
         <div class="trk-box"><div class="trk-hd">2.2 Cơ cấu doanh số theo ngành</div><div class="sp-chart" id="ach-donut" style="min-height:280px"></div></div>
       </div>
-      <div class="trk-ban"><b>3</b><span>NHÃN HÀNG · CHỈ TIÊU · TỶ TRỌNG</span><em id="ach-b3"></em></div>
-      <div class="trk-box"><div class="ach-flt" id="ach-flt"></div><div id="ach-br" style="overflow-x:auto"></div></div>
-      <div class="trk-ban"><b>4</b><span>NHÓM SKU · SKU · TỶ TRỌNG · ASO</span><em id="ach-b4"></em></div>
-      <div class="trk-box"><div class="trk-hd">4.1 Nhóm SKU chuẩn (khoan sâu theo nhãn đang chọn)</div><div id="ach-gr" style="overflow-x:auto"></div><div class="ach-q" style="margin:10px 0 0"><button type="button" id="ach-gmore"></button><span id="ach-b4g" class="trk-leg" style="align-self:center"></span></div></div>
-      <div class="trk-box"><div class="trk-hd">4.2 SKU chuẩn: chỉ tiêu · thực hiện · tỷ trọng (theo bộ lọc ngành, nhãn, ô tìm kiếm bên dưới)</div><div id="ach-ss" style="overflow-x:auto"></div><div class="ach-q" style="margin:10px 0 0"><button type="button" id="ach-smore"></button></div></div>
-      <div class="trk-box"><div class="trk-hd">4.3 Chi tiết SKU theo đơn hàng: tỷ trọng thực hiện, % trong nhóm SKU, ASO</div><div class="ach-q"><input id="ach-q" type="search" placeholder="Tìm SKU hoặc nhãn hàng…" autocomplete="off"><button type="button" id="ach-more"></button></div><div id="ach-sku" style="overflow-x:auto"></div></div>
-      <div class="trk-ban"><b>5</b><span>PHÂN TÍCH TỶ TRỌNG DOANH SỐ</span><em id="ach-b5"></em></div>
+      <div class="trk-ban"><b>3</b><span>PHÂN TÍCH TỶ TRỌNG DOANH SỐ</span><em id="ach-b5"></em></div>
       <div class="ach-two">
         <div class="trk-note" id="ach-ins"></div>
-        <div class="trk-box"><div class="trk-hd">5.1 Pareto SKU: tỷ lệ doanh số lũy kế</div><div class="sp-chart" id="ach-par" style="min-height:250px"></div></div>
+        <div class="trk-box"><div class="trk-hd">3.1 Pareto SKU: tỷ lệ doanh số lũy kế</div><div class="sp-chart" id="ach-par" style="min-height:250px"></div></div>
       </div>
-      <div class="trk-box"><div class="trk-hd">5.2 Bản đồ tỷ trọng ngành theo ĐDKD (so với mặt bằng NPP)</div><div class="trk-leg">Ô xanh: tỷ trọng cao hơn NPP · ô cam: thấp hơn NPP · bấm một dòng để khoan sâu ĐDKD đó</div><div id="ach-heat" style="overflow-x:auto"></div></div>
+      <div class="trk-box"><div class="trk-hd">3.2 Bản đồ tỷ trọng ngành theo ĐDKD (so với mặt bằng NPP)</div><div class="trk-leg">Ô xanh: tỷ trọng cao hơn NPP · ô cam: thấp hơn NPP · bấm một dòng để khoan sâu ĐDKD đó</div><div id="ach-heat" style="overflow-x:auto"></div></div>
     </section>
 
     <!-- ============ TRACKING NGÀY ============ -->
@@ -2339,7 +2336,7 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     const nc = (n) => NGC[n] || 'hsl(222 12% 58%)';
     const tr = (v) => (v >= 1e9 ? vi(v / 1e9, 2) + ' tỷ' : vi(v / 1e6, v < 1e7 ? 1 : 0) + ' tr'), pc = (v, d) => vi(v * 100, d === undefined ? 1 : d) + '%';
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const sel = (n) => { A.sc = n; A.ng = ''; A.br = ''; A.q = ''; A.all = false; renderAch(); };
+    const sel = (n) => { A.sc = n; A.ng = ''; A.br = ''; A.q = ''; A.all = false; A.open = {}; renderAch(); };
     const tone = (p) => (p >= prg ? GOOD : p >= prg - .1 ? WARN : BAD);
     const tile = (h, l, big, unit, sub) => `<div class="trk-st" style="--h:${h}"><div class="l">${l}</div><div class="v"><b>${big}</b>${unit ? `<small>${unit}</small>` : ''}</div><div class="s">${sub}</div></div>`;
     /* --- chọn phạm vi --- */
@@ -2396,38 +2393,25 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     };
     const dpts2 = (d) => { d *= 100; return `<span class="ach-d ${d >= 0 ? 'u' : 'd'}" style="margin:0">${d >= 0 ? '▲ +' : '▼ −'}${vi(Math.abs(d), 1)}đ</span>`; };
     const note = hasCt ? '<div class="trk-leg" style="margin-top:8px">Tỷ trọng CT = phần của dòng này trong tổng chỉ tiêu; tỷ trọng TH = phần trong tổng doanh số thực hiện. Chênh dương (▲) là dòng đang đóng góp nhiều hơn kỳ vọng của chỉ tiêu. Đóng góp %CT = doanh số dòng ÷ tổng chỉ tiêu (cộng các dòng ra % đạt chung). Chỉ tiêu và thực hiện lấy từ file TARGETACTUAL T10 (số chính thức theo ngành, nhãn, nhóm SKU, SKU chuẩn); ASO lấy từ đơn hàng.</div>' : '<div class="trk-leg" style="margin-top:8px">Phạm vi này chưa có chỉ tiêu T10 nên chỉ hiện thực hiện, tỷ trọng và ASO. Chọn một ĐDKD hoặc Team SS Pháp để xem chỉ tiêu.</div>';
-    box('ach-ng').innerHTML = lvl(sc.ng, { h: 'Ngành hàng', attr: 'data-ng', on: (r) => ngSel === r.n, col: (r) => nc(r.n), cell: (r) => `<i class="ach-dot" style="background:${nc(r.n)}"></i>${esc(r.n)}` }) + note;
-    box('ach-ng').querySelectorAll('tr[data-ng]').forEach((tr2) => tr2.addEventListener('click', () => { A.ng = A.ng === tr2.dataset.ng ? '' : tr2.dataset.ng; A.br = ''; A.all = false; renderAch(); }));
+    /* cây khoan sâu: ngành → nhãn → SKU chuẩn */
+    A.open = A.open || {};
+    const flat = [];
+    sc.ng.forEach((g) => { flat.push(Object.assign({ lv: 0, k: g.n, has: true }, g)); if (A.open[g.n]) sc.br.filter((b2) => b2.ng === g.n).forEach((b2) => { const k2 = g.n + '|' + b2.n; flat.push(Object.assign({ lv: 1, k: k2, has: true }, b2)); if (A.open[k2]) sc.ss.filter((s2) => s2.ng === g.n && s2.br === b2.n).forEach((s2) => flat.push(Object.assign({ lv: 2, k: '', has: false, noAso: true, ng2: g.n }, s2))); }); });
+    let tt = '<table class="ach-tb"><thead><tr><th>Ngành › nhãn › SKU</th><th>Chỉ tiêu</th><th>Thực hiện</th><th>% TH/CT</th><th>Tỷ trọng CT</th><th>Tỷ trọng TH</th><th>Chênh tỷ trọng</th><th>Đóng góp %CT</th><th>Còn thiếu</th><th>ASO</th><th>% KH mua</th></tr></thead><tbody>';
+    flat.forEach((r) => { const p = r.ct ? r.ds / r.ct : null, shT = sc.ct ? r.ct / sc.ct : 0, shH = r.ds / sc.ds, ng0 = r.lv === 2 ? r.ng2 : r.ng || r.n, c = nc(r.lv === 0 ? r.n : r.ng), pad = r.lv * 22;
+      const lab = r.lv === 0 ? `<i class="ach-dot" style="background:${c}"></i><b>${esc(r.n)}</b>` : r.lv === 1 ? esc(r.n) : `<span style="color:hsl(222 12% 46%)">${esc(r.n)}</span>`;
+      tt += `<tr class="${r.has ? 'cl' : ''} lv${r.lv} ${r.lv === 0 && ngSel === r.n ? 'on' : ''}" ${r.has ? 'data-k="' + esc(r.k) + '"' : ''}><td class="nm" style="padding-left:${10 + pad}px">${r.has ? '<span class="ach-tg">' + (A.open[r.k] ? '▾' : '▸') + '</span>' : '<span class="ach-tg"> </span>'}${lab}</td><td>${r.ct ? tr(r.ct) : '—'}</td><td><b>${tr(r.ds)}</b></td><td>${p !== null ? `<b style="color:${p >= 1 ? GOOD : p >= .8 ? WARN : BAD}">${pc(p, 0)}</b>` : '—'}</td><td><span class="ach-bar"><u style="width:${Math.min(shT * 100 * (r.lv ? 6 : 2), 100)}%;background:hsl(222 12% 62%)"></u></span>${pc(shT)}</td><td><span class="ach-bar"><u style="width:${Math.min(shH * 100 * (r.lv ? 6 : 2), 100)}%;background:${c}"></u></span>${pc(shH)}</td><td>${r.ct ? dpts2(shH - shT) : '—'}</td><td>${pc(r.ds / sc.ct, 1)}</td><td>${r.ct && r.ct > r.ds ? '<span style="color:' + BAD + ';font-weight:700">' + tr(r.ct - r.ds) + '</span>' : '—'}</td><td>${r.noAso ? '' : fN(r.aso)}</td><td>${r.noAso ? '' : pc(r.aso / (sc.aso || 1), 0)}</td></tr>`; });
+    tt += `<tr class="tot"><td>Cộng toàn phạm vi</td><td>${tr(sc.ct)}</td><td>${tr(sc.ds)}</td><td>${pc(sc.ds / sc.ct, 1)}</td><td>100%</td><td>100%</td><td></td><td>${pc(sc.ds / sc.ct, 1)}</td><td>${tr(Math.max(sc.ct - sc.ds, 0))}</td><td>${fN(sc.aso)}</td><td></td></tr></tbody></table>`;
+    box('ach-ng').innerHTML = tt + note;
+    box('ach-ng').querySelectorAll('tr[data-k]').forEach((tr2) => tr2.addEventListener('click', () => { const k = tr2.dataset.k; A.open[k] = !A.open[k]; if (!k.includes('|')) A.ng = A.open[k] ? k : (A.ng === k ? '' : A.ng); renderAch(); }));
+    const xa = box('ach-expall'); xa.onclick = () => { const anyOpen = Object.values(A.open).some((v) => v); A.open = {}; if (!anyOpen) sc.ng.forEach((g) => { A.open[g.n] = true; }); renderAch(); };
+    const xb = box('ach-expbr'); xb.onclick = () => { A.open = {}; sc.ng.forEach((g) => { A.open[g.n] = true; sc.br.filter((b2) => b2.ng === g.n).forEach((b2) => { A.open[g.n + '|' + b2.n] = true; }); }); renderAch(); };
     chartInto('ach-donut', 'ach', (b) => {
       const ent = sc.ng.filter((r) => r.ds > 0), arc = d3.arc().innerRadius(78).outerRadius(112).cornerRadius(4).padAngle(.012), pie = d3.pie().sort(null).value((e) => e.ds);
       let s = `<svg class="trk-svg" width="240" height="240" viewBox="-120 -120 240 240" style="display:block;margin:0 auto">` + pie(ent).map((a) => `<path d="${arc(a)}" fill="${nc(a.data.n)}" opacity="${!ngSel || ngSel === a.data.n ? 1 : .28}" style="cursor:pointer" data-ng="${esc(a.data.n)}"/>`).join('') + `<text class="lab" text-anchor="middle" y="2" style="font-size:24px">${tr(sc.ds).split(' ')[0]}</text><text text-anchor="middle" y="22">${tr(sc.ds).split(' ')[1]}</text></svg>`;
       b.innerHTML = s + '<div class="trk-legend">' + ent.map((e) => `<span><i style="background:${nc(e.n)}"></i>${esc(e.n)} <b>${pc(e.ds / sc.ds)}</b></span>`).join('') + '</div>';
-      b.querySelectorAll('path[data-ng]').forEach((p) => p.addEventListener('click', () => { A.ng = A.ng === p.dataset.ng ? '' : p.dataset.ng; A.br = ''; A.all = false; renderAch(); }));
+      b.querySelectorAll('path[data-ng]').forEach((p) => p.addEventListener('click', () => { const k = p.dataset.ng; A.open = A.open || {}; A.open[k] = !A.open[k]; A.ng = A.open[k] ? k : ''; renderAch(); }));
     });
-    /* --- 3. nhãn hàng --- */
-    const brs = sc.br.filter((r) => !A.ng || r.ng === A.ng), brTot = brs.reduce((a, r) => a + r.ds, 0);
-    box('ach-b3').textContent = brs.length + ' nhãn' + (A.ng ? ' thuộc ' + A.ng : '') + ' · ' + tr(brTot);
-    box('ach-flt').innerHTML = (A.ng ? `<span class="ach-chip" data-x="ng">Ngành: ${esc(A.ng)} ✕</span>` : '<span>Đang xem tất cả ngành. Bấm ngành ở mục 2 để lọc.</span>') + (A.br ? `<span class="ach-chip" data-x="br">Nhãn: ${esc(A.br)} ✕</span>` : '') + '<span style="margin-left:auto">Bấm một nhãn để lọc SKU bên dưới · "ASO" = số KH có mua nhãn đó</span>';
-    box('ach-flt').querySelectorAll('.ach-chip').forEach((c) => c.addEventListener('click', () => { if (c.dataset.x === 'ng') { A.ng = ''; A.br = ''; } else A.br = ''; A.all = false; renderAch(); }));
-    box('ach-br').innerHTML = lvl(brs, { h: 'Nhãn hàng', attr: 'data-br', on: (r) => A.br === r.n, col: (r) => nc(r.ng), cell: (r) => `<i class="ach-dot" style="background:${nc(r.ng)}"></i>${esc(r.n)} <small style="color:hsl(222 12% 50%)">${esc(r.ng)}</small>` });
-    box('ach-br').querySelectorAll('tr[data-br]').forEach((r2) => r2.addEventListener('click', () => { A.br = A.br === r2.dataset.br ? '' : r2.dataset.br; A.all = false; renderAch(); }));
-    /* --- 4. SKU --- */
-    const grs = sc.gr.filter((r) => (!A.ng || r.ng === A.ng) && (!A.br || r.br === A.br)); box('ach-b4g').textContent = grs.length + ' nhóm SKU chuẩn';
-    box('ach-gr').innerHTML = lvl(grs.slice(0, A.allg ? grs.length : 20), { h: 'Nhóm SKU chuẩn', attr: '', on: () => false, col: (r) => nc(r.ng), cell: (r) => `<i class="ach-dot" style="background:${nc(r.ng)}"></i>${esc(r.n)} <small style="color:hsl(222 12% 50%)">${esc(r.br)}</small>` });
-    const gm = box('ach-gmore'); gm.textContent = grs.length > 20 ? (A.allg ? 'Thu gọn top 20 nhóm' : 'Xem tất cả ' + grs.length + ' nhóm SKU chuẩn') : ''; gm.style.display = grs.length > 20 ? '' : 'none'; gm.onclick = () => { A.allg = !A.allg; renderAch(); };
-    const q0 = (A.q || '').toLowerCase().trim(), ssr = sc.ss.filter((r) => (!A.ng || r.ng === A.ng) && (!A.br || r.br === A.br) && (!q0 || (r.n + ' ' + r.br + ' ' + r.gr).toLowerCase().includes(q0)));
-    box('ach-ss').innerHTML = lvl(ssr.slice(0, A.alls ? ssr.length : 25), { h: 'SKU chuẩn', attr: '', on: () => false, noAso: true, col: (r) => nc(r.ng), cell: (r) => `<i class="ach-dot" style="background:${nc(r.ng)}"></i>${esc(r.n)} <small style="color:hsl(222 12% 50%)">${esc(r.br)}</small>` });
-    const sm = box('ach-smore'); sm.textContent = ssr.length > 25 ? (A.alls ? 'Thu gọn top 25 SKU chuẩn' : 'Xem tất cả ' + ssr.length + ' SKU chuẩn') : ''; sm.style.display = ssr.length > 25 ? '' : 'none'; sm.onclick = () => { A.alls = !A.alls; renderAch(); };
-    const q = (A.q || '').toLowerCase().trim();
-    let sk = sc.sku.filter((r) => (!A.ng || r.ng === A.ng) && (!A.br || r.br === A.br) && (!q || (r.n + ' ' + r.br + ' ' + r.c).toLowerCase().includes(q)));
-    const gsum = {}; sc.sku.forEach((r) => { gsum[r.gr] = (gsum[r.gr] || 0) + r.ds; }); const skTot = sk.reduce((a, r) => a + r.ds, 0), lim = A.all ? sk.length : 25; let cum = 0;
-    box('ach-b4').textContent = sk.length + ' SKU · ' + tr(skTot) + (A.br ? ' · nhãn ' + A.br : A.ng ? ' · ngành ' + A.ng : '');
-    let ts = '<table class="ach-tb"><thead><tr><th class="l">#</th><th class="l">SKU</th><th class="l">Nhãn</th><th>Doanh số</th><th>Tỷ trọng TH</th><th>% trong nhóm SKU</th><th>Lũy kế</th><th>ASO SKU</th><th>% KH mua</th><th>Số đơn</th></tr></thead><tbody>';
-    sk.slice(0, lim).forEach((r, i) => { cum += r.ds; ts += `<tr><td class="l">${i + 1}</td><td class="nm" title="${esc(r.c)}">${esc(r.n)}</td><td class="l"><i class="ach-dot" style="background:${nc(r.ng)}"></i>${esc(r.br)}</td><td><b>${tr(r.ds)}</b></td><td><span class="ach-bar"><u style="width:${Math.min(r.ds / (sk[0].ds || 1) * 100, 100)}%;background:${nc(r.ng)}"></u></span>${pc(r.ds / sc.ds, 2)}</td><td>${pc(r.ds / ((gsum[r.gr]) || 1), 0)}</td><td>${pc(cum / (skTot || 1), 0)}</td><td>${fN(r.aso)}</td><td>${pc(r.aso / (sc.aso || 1), 0)}</td><td>${fN(r.pc)}</td></tr>`; });
-    box('ach-sku').innerHTML = ts + '</tbody></table>' + (sk.length ? '' : '<p class="trk-leg">Không có SKU phù hợp.</p>');
-    const inp = box('ach-q'); if (inp.value !== (A.q || '')) inp.value = A.q || '';
-    inp.oninput = () => { A.q = inp.value; A.all = false; const pos = inp.selectionStart; renderAch(); const i2 = box('ach-q'); i2.focus(); try { i2.setSelectionRange(pos, pos); } catch (e) {} };
-    const mb = box('ach-more'); mb.textContent = sk.length > 25 ? (A.all ? 'Thu gọn top 25' : 'Xem tất cả ' + sk.length + ' SKU') : ''; mb.style.display = sk.length > 25 ? '' : 'none'; mb.onclick = () => { A.all = !A.all; renderAch(); };
     /* --- 5. phân tích tỷ trọng --- */
     const all = sc.sku, aT = sc.ds; let c2 = 0, n80 = 0, n50 = 0; all.forEach((r, i) => { c2 += r.ds; if (!n50 && c2 >= .5 * aT) n50 = i + 1; if (!n80 && c2 >= .8 * aT) n80 = i + 1; });
     const top3b = sc.br.slice(0, 3), top3s = top3b.reduce((a, r) => a + r.ds, 0) / aT, top10 = all.slice(0, 10).reduce((a, r) => a + r.ds, 0) / aT;
