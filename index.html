@@ -365,7 +365,7 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     <button type="button" role="tab" data-tab="ct11" aria-selected="false"><span data-ic="trend"></span>So sánh CT T11</button>
     <button type="button" role="tab" data-tab="ton" aria-selected="false"><span data-ic="box"></span>Tồn kho NPP</button>
     <button type="button" role="tab" data-tab="ops" aria-selected="false"><span data-ic="pulse"></span>KPI vận hành</button>
-    <button type="button" role="tab" data-tab="prog" aria-selected="false"><span data-ic="gift"></span>COMBO · TĂNG DOANH SỐ</button>
+    <button type="button" role="tab" data-tab="prog" aria-selected="false"><span data-ic="gift"></span>COMBO</button><button type="button" role="tab" data-tab="growth" aria-selected="false"><span data-ic="trend"></span>TĂNG DOANH SỐ</button>
     <button type="button" role="tab" data-tab="ytd" aria-selected="false"><span data-ic="target"></span>Chỉ tiêu T1–T9 &amp; cùng kỳ</button>
     <button type="button" role="tab" data-tab="ape" aria-selected="false"><span data-ic="medal"></span>Thực hiện APE</button>
     <button type="button" role="tab" data-tab="mcpon" aria-selected="false"><span data-ic="users"></span>MCP ON</button>
@@ -509,6 +509,7 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     </section>
 
     <!-- ============ CHƯƠNG TRÌNH ============ -->
+    <section class="sp-panel" id="growth" data-panel="growth" hidden></section>
     <section class="sp-panel" id="prog" data-panel="prog" hidden>
       <div class="sp-ins-list" id="prog-ins"></div>
       <div id="prog-none" class="sp-empty" hidden>T7 chưa có chương trình gắn kết / tăng doanh số trong file tracking. Chọn T8 hoặc T9.</div>
@@ -1197,7 +1198,7 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
   document.getElementById('f-dd').addEventListener('change', (e) => setDD(e.target.value));
   root.querySelectorAll('.sp-tabs button').forEach((b) => b.addEventListener('click', () => { S.tab = b.dataset.tab; dash.setLink(S.tab); render(); }));
   const hashTab = location.hash.slice(1);
-  if (['overview', 'hv', 'ach', 'trk', 'mtx', 'ct11', 'ton', 'ops', 'prog', 'ytd', 'ape', 'mcpon', 'mcpoff', 'rr', 'act'].includes(hashTab)) S.tab = hashTab;
+  if (['overview', 'hv', 'ach', 'trk', 'mtx', 'ct11', 'ton', 'ops', 'prog', 'growth', 'ytd', 'ape', 'mcpon', 'mcpoff', 'rr', 'act'].includes(hashTab)) S.tab = hashTab;
   ['buy-search:buy', 'plan-search:plan', 'cb-search:cb', 'cbd-search:cbd', 'ov-search:ov', 'hv-search:hv', 'ops-search:ops', 'prog-search:prog', 'risk-search:risk', 'td-search:td', 'mo-search:mo', 'mf-search:mf', 'gap-search:gap'].forEach((p) => { const [i, k] = p.split(':'); bindSearch(i, k); });
 
   /* ---------- pages ---------- */
@@ -2947,7 +2948,7 @@ html,body{margin:0;background:#f0f0f0}body{padding:12px max(12px,env(safe-area-i
     if (I) { const h = I.find((x) => x.id === (S.m === 11 ? 'hero_11' : 'hero')); hero.textContent = h ? h.text : '—'; hero.classList.remove('dash-skeleton'); }
     hideTip();
     try {
-      ({ overview: renderOverview, hv: renderHV, ach: renderAch, trk: renderTrk, mtx: renderMtx, ct11: renderCt11, ton: renderTon, ops: renderOps, prog: () => { renderProg(); renderComboOn(); }, ytd: renderYTD, ape: renderAPE, mcpon: renderMcpOn, mcpoff: renderMcpOff, rr: renderRR, act: renderAct })[S.tab]();
+      ({ overview: renderOverview, hv: renderHV, ach: renderAch, trk: renderTrk, mtx: renderMtx, ct11: renderCt11, ton: renderTon, ops: renderOps, prog: () => { renderProg(); renderComboOn(); }, growth: () => {}, ytd: renderYTD, ape: renderAPE, mcpon: renderMcpOn, mcpoff: renderMcpOff, rr: renderRR, act: renderAct })[S.tab]();
     } catch (e) { console.error(e); try { window.__v11Apply && window.__v11Apply(S); } catch (_) {} throw e; }
     try { emphasize(); } catch (e) { console.error(e); }
     try { window.__v11Apply && window.__v11Apply(S); } catch (e) { console.error(e); }
@@ -3430,15 +3431,12 @@ function renderGrowth11(){v11Mount(v11Growth)}
 
 
 window.__v11Apply=function(S){
- [['hv','mbs'],['prog','combo']].forEach(function(a){var id=a[0],v=a[1],p=document.getElementById(id);if(!p)return;var h=document.getElementById('v11host_'+id),bar=document.getElementById('v11bar_'+id);
+ [['hv','mbs'],['prog','combo'],['growth','growth']].forEach(function(a){var id=a[0],v=a[1],p=document.getElementById(id);if(!p)return;var h=document.getElementById('v11host_'+id),bar=document.getElementById('v11bar_'+id);
   if(S.m===11&&S.tab===id){
    if(!h){h=document.createElement('div');h.id='v11host_'+id;p.insertBefore(h,p.firstChild)}
-   if(id==='prog'){if(!bar){bar=document.createElement('div');bar.id='v11bar_'+id;p.insertBefore(bar,h);bar.addEventListener('click',function(e){var b=e.target.closest('[data-pv]');if(b){V11.pv=b.dataset.pv;window.__v11Apply(window.__sp)}})}
-    V11.pv=V11.pv||'combo';v=V11.pv;
-    bar.innerHTML='<div style="display:flex;gap:8px;margin:6px 0 10px"><button class="btn" data-pv="combo" style="border:1px solid #cfd6e6;border-radius:999px;padding:8px 18px;font-weight:800;cursor:pointer;'+(v==='combo'?'background:#2f6bff;color:#fff':'background:#fff;color:#1f2a44')+'">Combo đơn hàng</button><button class="btn" data-pv="growth" style="border:1px solid #cfd6e6;border-radius:999px;padding:8px 18px;font-weight:800;cursor:pointer;'+(v==='growth'?'background:#2f6bff;color:#fff':'background:#fff;color:#1f2a44')+'">Gắn kết &amp; SP tập trung</button></div>'}
    Array.prototype.forEach.call(p.children,function(ch){if(ch!==h&&ch!==bar){ch.dataset.v11h='1';ch.style.display='none'}});
    V11.view=v;V11.host=function(){return h};v11Mount(v==='mbs'?v11Mbs:v==='growth'?v11Growth:v11Combo);
-  }else{if(h)h.remove();if(bar)bar.remove();p.querySelectorAll(':scope>[data-v11h]').forEach(function(ch){ch.style.display='';delete ch.dataset.v11h})}
+  }else{if(h)h.remove();if(bar)bar.remove();if(id==='growth'&&S.tab==='growth'){h=document.createElement('div');h.id='v11host_growth';h.className='sp-empty';h.textContent='Tăng doanh số chi tiết (Gắn kết · SP tập trung) có từ T11. Chọn T11 · đến 03/11.';p.insertBefore(h,p.firstChild)}p.querySelectorAll(':scope>[data-v11h]').forEach(function(ch){ch.style.display='';delete ch.dataset.v11h})}
  });
 };
 </script>
