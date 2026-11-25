@@ -4279,7 +4279,7 @@ html body #v11 table.cdt tr.tot td{border-top:2px solid #2563EB;font-weight:800}
 </style><script id="stk-name">
 (function(){
  var css=document.createElement('style');css.textContent='html body table td.stk-n,html body table th.stk-n{position:sticky!important;left:0!important;z-index:3!important;box-shadow:2px 0 0 rgba(120,135,175,.28)}html body table th.stk-n{z-index:6!important}';document.head.appendChild(css);
- function bg(el){var L=[],t=el;while(t&&t.nodeType===1){var m=(getComputedStyle(t).backgroundColor||'').match(/[\d.]+/g);if(m&&m.length>=3){var al=m.length>3?+m[3]:1;if(al>0){L.push([+m[0],+m[1],+m[2],al]);if(al>=1)break}}t=t.parentElement}var r=255,g=255,b=255;for(var i=L.length-1;i>=0;i--){var x=L[i];r=x[0]*x[3]+r*(1-x[3]);g=x[1]*x[3]+g*(1-x[3]);b=x[2]*x[3]+b*(1-x[3])}return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')'}
+ function bg(el){var L=[],t=el;while(t&&t.nodeType===1){if(t===document.body||t===document.documentElement)break;var cs=getComputedStyle(t),m=(cs.backgroundColor||'').match(/[\d.]+/g);if(cs.backgroundImage&&cs.backgroundImage!=='none'&&(!m||m.length<4||+m[3]===0)){L.length=0;break}if(m&&m.length>=3){var al=m.length>3?+m[3]:1;if(al>0){L.push([+m[0],+m[1],+m[2],al]);if(al>=1)break}}t=t.parentElement}var r=255,g=255,b=255;for(var i=L.length-1;i>=0;i--){var x=L[i];r=x[0]*x[3]+r*(1-x[3]);g=x[1]*x[3]+g*(1-x[3]);b=x[2]*x[3]+b*(1-x[3])}return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')'}
  function run(){
   var host=document.body;
   host.querySelectorAll('table').forEach(function(tb){
